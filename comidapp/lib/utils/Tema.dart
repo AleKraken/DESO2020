@@ -6,9 +6,9 @@ ThemeData temaPrincipal() {
     return base.copyWith(
         headline1: base.headline1.copyWith(
           fontFamily: GoogleFonts.baiJamjuree().fontFamily,
-          fontSize: 18.0,
+          fontSize: 16.0,
           color: Colors.black,
-          fontWeight: FontWeight.bold,
+          fontWeight: FontWeight.w600,
         ),
         headline2: base.headline1.copyWith(
           fontFamily: GoogleFonts.baiJamjuree().fontFamily,
@@ -40,6 +40,8 @@ ThemeData temaPrincipal() {
       color: Color(0xFFFE7A66),
       size: 21,
     ),
+    shadowColor: Colors.grey,
+    cardColor: Colors.white,
     indicatorColor: Colors.blue,
     appBarTheme: AppBarTheme(
       textTheme: TextTheme(headline1: base.textTheme.headline1),

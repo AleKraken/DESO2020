@@ -1,7 +1,7 @@
 import 'package:comidapp/pages/pageFavoritos.dart';
 import 'package:comidapp/pages/pageHorarioComidas.dart';
 import 'package:comidapp/pages/pageIngredientes.dart';
-import 'package:comidapp/pages/pageRecetas.dart';
+import 'package:comidapp/pages/pageRecetasComidas.dart';
 import 'package:comidapp/utils/Tema.dart';
 import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
@@ -59,11 +59,16 @@ class _MyHomePageState extends State<MyHomePage> {
             padding: EdgeInsets.only(bottom: 30),
             physics: NeverScrollableScrollPhysics(),
             child: BottomNavigationBar(
+              elevation: 16,
               fixedColor: Colors.black,
               type: BottomNavigationBarType.fixed,
               currentIndex: _indicePagina,
               iconSize: Theme.of(context).iconTheme.size,
               unselectedFontSize: 9,
+              selectedLabelStyle:
+                  Theme.of(context).textTheme.headline1.copyWith(fontSize: 12),
+              unselectedLabelStyle:
+                  Theme.of(context).textTheme.headline1.copyWith(fontSize: 10),
               selectedFontSize: 12,
               selectedIconTheme: Theme.of(context).iconTheme.copyWith(size: 25),
               items: [
@@ -78,10 +83,10 @@ class _MyHomePageState extends State<MyHomePage> {
                 BottomNavigationBarItem(
                     label: "Comidas",
                     activeIcon: Icon(
-                      MdiIcons.noodles,
+                      MdiIcons.food,
                     ),
                     icon: Icon(
-                      MdiIcons.noodles,
+                      MdiIcons.food,
                     )),
                 BottomNavigationBarItem(
                     label: "Ingredientes",
