@@ -9,6 +9,7 @@ class Comida {
   int minutosPreparacion;
   String pasosPreparacion;
   int calorias;
+  String rutaImagen;
   int favoritoComida;
 
   Comida({
@@ -18,6 +19,7 @@ class Comida {
     this.minutosPreparacion,
     this.pasosPreparacion,
     this.calorias,
+    this.rutaImagen,
     this.favoritoComida,
   });
 
@@ -29,6 +31,7 @@ class Comida {
       DatabaseProvider.COLUMN_MINUTOSPREPARACION: minutosPreparacion,
       DatabaseProvider.COLUMN_PASOSPREPARACION: pasosPreparacion,
       DatabaseProvider.COLUMN_CALORIAS: calorias,
+      DatabaseProvider.COLUMN_RUTAIMAGEN: rutaImagen,
       DatabaseProvider.COLUMN_FAVORITOCOMIDA: favoritoComida,
     };
 
@@ -46,6 +49,7 @@ class Comida {
     minutosPreparacion = map[DatabaseProvider.COLUMN_MINUTOSPREPARACION];
     pasosPreparacion = map[DatabaseProvider.COLUMN_PASOSPREPARACION];
     calorias = map[DatabaseProvider.COLUMN_CALORIAS];
+    rutaImagen = map[DatabaseProvider.COLUMN_RUTAIMAGEN];
     favoritoComida = map[DatabaseProvider.COLUMN_FAVORITOCOMIDA];
   }
 }

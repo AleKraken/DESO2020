@@ -1,5 +1,7 @@
+import 'package:comidapp/api/consultasApi.dart';
 import 'package:comidapp/models/comida.dart';
 import 'package:comidapp/models/ingrediente.dart';
+import 'package:comidapp/models/mealsFromJson.dart';
 import 'package:path/path.dart';
 
 import 'package:sqflite/sqflite.dart';
@@ -14,6 +16,7 @@ class DatabaseProvider {
   static const String COLUMN_MINUTOSPREPARACION = "minutosPreparacion";
   static const String COLUMN_PASOSPREPARACION = "pasosPreparacion";
   static const String COLUMN_CALORIAS = "calorias";
+  static const String COLUMN_RUTAIMAGEN = "rutaImagen";
   static const String COLUMN_FAVORITOCOMIDA = "favoritoComida";
 
   //CONSTANTES PARA LA TABLA 'INGREDIENTE'
@@ -60,6 +63,7 @@ class DatabaseProvider {
           "$COLUMN_MINUTOSPREPARACION INTEGER NOT NULL,"
           "$COLUMN_PASOSPREPARACION TEXT NOT NULL,"
           "$COLUMN_CALORIAS INTEGER,"
+          "$COLUMN_RUTAIMAGEN TEXT,"
           "$COLUMN_FAVORITOCOMIDA INTEGER NOT NULL,"
           "PRIMARY KEY ($COLUMN_IDCOMIDA AUTOINCREMENT)"
           ");",
@@ -83,17 +87,23 @@ class DatabaseProvider {
           ");",
         );
 
-        for (int i = 0; i < 1000; i++) {
+        List<Meal> listaComidas = await ApiExterna.getComidasDeApi();
+
+        for (int i = 0; i < listaComidas.length; i++) {
+          String nombreComida = '"${listaComidas[i].meals[0].strMeal}"';
+          String rutaImagen = '"${listaComidas[i].meals[0].strMealThumb}"';
+
+          print("GUARDANDO $i EN BASE");
           await database.execute("INSERT INTO $TABLE_COMIDA "
-              "($COLUMN_NOMBRECOMIDA, $COLUMN_DESCRIPCION, $COLUMN_MINUTOSPREPARACION, $COLUMN_PASOSPREPARACION, $COLUMN_CALORIAS, $COLUMN_FAVORITOCOMIDA)"
-              " values ('Ensalada con pollo $i', 'Rica ensaladita para la dieta', 45, '1.- Sírvelo y listo xd', 750, 0);");
+              "($COLUMN_NOMBRECOMIDA, $COLUMN_DESCRIPCION, $COLUMN_MINUTOSPREPARACION, $COLUMN_PASOSPREPARACION, $COLUMN_CALORIAS, $COLUMN_RUTAIMAGEN, $COLUMN_FAVORITOCOMIDA)"
+              " values ($nombreComida, 'Rica ensaladita para la dieta', 45, '1.- Sírvelo y listo xd', 750, $rutaImagen, 0);");
         }
 
-        for (int i = 0; i < 1000; i++) {
+        /*for (int i = 0; i < 1000; i++) {
           await database.execute("INSERT INTO $TABLE_INGREDIENTE "
               "($COLUMN_NOMBREINGREDIENTE, $COLUMN_FAVORITOINGREDIENTE)"
               " values ('Tomate $i', 0);");
-        }
+        }*/
       },
     );
   }
@@ -108,6 +118,7 @@ class DatabaseProvider {
         "$COLUMN_MINUTOSPREPARACION,"
         "$COLUMN_PASOSPREPARACION,"
         "$COLUMN_CALORIAS,"
+        "$COLUMN_RUTAIMAGEN,"
         "$COLUMN_FAVORITOCOMIDA "
         "FROM $TABLE_COMIDA ");
 

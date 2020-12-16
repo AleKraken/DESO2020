@@ -25,6 +25,7 @@ class _HorarioComidasState extends State<HorarioComidas> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Theme.of(context).backgroundColor,
       appBar: AppBar(
         toolbarHeight: 35,
         title: Container(
@@ -70,7 +71,7 @@ class _HorarioComidasState extends State<HorarioComidas> {
 
   Widget paginaHorario(int index) {
     return Container(
-      color: Colors.white,
+      color: Theme.of(context).backgroundColor,
       child: SingleChildScrollView(
         physics: BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
         child: Column(

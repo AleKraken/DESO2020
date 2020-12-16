@@ -33,7 +33,7 @@ ThemeData temaPrincipal() {
 
   return base.copyWith(
     textTheme: _temaTextoPrincipal(base.textTheme),
-    backgroundColor: Colors.white,
+    backgroundColor: Color(0xFFF4F4F4),
     primaryColorLight: Colors.blue,
     primaryColorDark: Colors.blueAccent[900],
     iconTheme: IconThemeData(

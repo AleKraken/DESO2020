@@ -1,13 +1,11 @@
-import 'dart:convert';
-
 import 'package:comidapp/DB/dataBaseProvider.dart';
 import 'package:comidapp/models/comida.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:like_button/like_button.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:progressive_image/progressive_image.dart';
 
 class RecetasComidas extends StatefulWidget {
   RecetasComidas({Key key}) : super(key: key);
@@ -19,13 +17,11 @@ class RecetasComidas extends StatefulWidget {
 class _RecetasComidasState extends State<RecetasComidas> {
   Future _futureComidas;
   List<Comida> listaComidas = new List<Comida>();
-  String rutaImagenComida;
 
   @override
   void initState() {
     super.initState();
     _futureComidas = _getComidas();
-    getComidasHttps();
   }
 
   Future _getComidas() async {
@@ -33,6 +29,7 @@ class _RecetasComidasState extends State<RecetasComidas> {
       (lComidas) {
         setState(() {
           listaComidas = lComidas;
+          print(listaComidas.length);
         });
       },
     );
@@ -42,6 +39,7 @@ class _RecetasComidasState extends State<RecetasComidas> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Theme.of(context).backgroundColor,
       appBar: AppBar(
         toolbarHeight: 35,
         title: Center(
@@ -170,7 +168,6 @@ class SearchBar extends StatelessWidget {
 class ContenedorComida extends StatelessWidget {
   final int index;
   final List<Comida> listaComidas;
-  String rutaImagenComida;
 
   ContenedorComida(this.index, this.listaComidas);
 
@@ -207,66 +204,37 @@ class ContenedorComida extends StatelessWidget {
                         spreadRadius: -5,
                       ),
                     ],
-                    borderRadius: BorderRadius.only(
-                      bottomLeft: Radius.circular(10),
-                      topLeft: Radius.circular(10),
-                    ),
+                    borderRadius: BorderRadius.circular(15),
                   ),
-                  child: FutureBuilder(
-                    future: getComidasHttps()
-                        .then((value) => rutaImagenComida = value),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return Container(
-                          height: 60,
-                          width: 60,
-                          decoration: BoxDecoration(
-                            boxShadow: [
-                              BoxShadow(
-                                blurRadius: 13,
-                                color: Theme.of(context).shadowColor,
-                                offset: const Offset(-3, 0),
-                                spreadRadius: -5,
-                              ),
-                            ],
-                            borderRadius: BorderRadius.only(
-                              bottomLeft: Radius.circular(10),
-                              topLeft: Radius.circular(10),
-                            ),
-                            image: DecorationImage(
-                              image: AssetImage('assets/images/platoVacio.jpg'),
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        );
-                      } else {
-                        return Container(
-                          height: 60,
-                          width: 60,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            boxShadow: [
-                              BoxShadow(
-                                blurRadius: 13,
-                                color: Theme.of(context).shadowColor,
-                                offset: const Offset(-3, 0),
-                                spreadRadius: -5,
-                              ),
-                            ],
-                            borderRadius: BorderRadius.only(
-                              bottomLeft: Radius.circular(10),
-                              topLeft: Radius.circular(10),
-                            ),
-                          ),
-                          child: FadeInImage(
-                            fit: BoxFit.cover,
-                            image: NetworkImage('$rutaImagenComida'),
-                            placeholder:
-                                AssetImage('assets/images/platoVacio.jpg'),
-                          ),
-                        );
-                      }
-                    },
+                  child: Container(
+                    height: 60,
+                    width: 60,
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).cardColor,
+                      borderRadius: BorderRadius.circular(10),
+                      boxShadow: [
+                        BoxShadow(
+                          blurRadius: 13,
+                          color: Theme.of(context).shadowColor,
+                          offset: const Offset(-1, 0),
+                          spreadRadius: -1,
+                        ),
+                      ],
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: ProgressiveImage(
+                        placeholder: AssetImage('assets/images/platoVacio.jpg'),
+                        // size: 1.87KB
+                        thumbnail: NetworkImage(
+                            '${listaComidas[7].rutaImagen}/preview'),
+                        // size: 1.29MB
+                        image: NetworkImage(
+                            '${listaComidas[index - 1].rutaImagen}'),
+                        height: 300,
+                        width: 500,
+                      ),
+                    ),
                   ),
                 ),
                 Expanded(
@@ -315,14 +283,45 @@ class ContenedorComida extends StatelessWidget {
                         ),
                         likeBuilder: (bool isLiked) {
                           return isLiked
-                              ? Icon(
-                                  MdiIcons.clockCheck,
-                                  size: 21,
+                              ? Container(
+                                  height: 30,
+                                  width: 30,
+                                  decoration: BoxDecoration(
+                                    color: Theme.of(context).cardColor,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        blurRadius: 6,
+                                        color: Theme.of(context).shadowColor,
+                                        spreadRadius: -2,
+                                      ),
+                                    ],
+                                    borderRadius: BorderRadius.circular(15),
+                                  ),
+                                  child: Icon(
+                                    MdiIcons.clockCheck,
+                                    color: Theme.of(context).iconTheme.color,
+                                    size: 21,
+                                  ),
                                 )
-                              : Icon(
-                                  MdiIcons.clockTimeFourOutline,
-                                  color: Colors.grey,
-                                  size: 21,
+                              : Container(
+                                  height: 30,
+                                  width: 30,
+                                  decoration: BoxDecoration(
+                                    color: Theme.of(context).cardColor,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        blurRadius: 6,
+                                        color: Theme.of(context).shadowColor,
+                                        spreadRadius: -2,
+                                      ),
+                                    ],
+                                    borderRadius: BorderRadius.circular(15),
+                                  ),
+                                  child: Icon(
+                                    MdiIcons.clockTimeFourOutline,
+                                    color: Colors.grey,
+                                    size: 21,
+                                  ),
                                 );
                         },
                       ),
@@ -339,15 +338,45 @@ class ContenedorComida extends StatelessWidget {
                         ),
                         likeBuilder: (bool isLiked) {
                           return isLiked
-                              ? Icon(
-                                  MdiIcons.heart,
-                                  color: Colors.red,
-                                  size: 21,
+                              ? Container(
+                                  height: 30,
+                                  width: 30,
+                                  decoration: BoxDecoration(
+                                    color: Theme.of(context).cardColor,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        blurRadius: 6,
+                                        color: Theme.of(context).shadowColor,
+                                        spreadRadius: -2,
+                                      ),
+                                    ],
+                                    borderRadius: BorderRadius.circular(15),
+                                  ),
+                                  child: Icon(
+                                    MdiIcons.heart,
+                                    color: Colors.red,
+                                    size: 21,
+                                  ),
                                 )
-                              : Icon(
-                                  MdiIcons.heartOutline,
-                                  color: Colors.grey,
-                                  size: 21,
+                              : Container(
+                                  height: 30,
+                                  width: 30,
+                                  decoration: BoxDecoration(
+                                    color: Theme.of(context).cardColor,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        blurRadius: 6,
+                                        color: Theme.of(context).shadowColor,
+                                        spreadRadius: -2,
+                                      ),
+                                    ],
+                                    borderRadius: BorderRadius.circular(15),
+                                  ),
+                                  child: Icon(
+                                    MdiIcons.heartOutline,
+                                    color: Colors.grey,
+                                    size: 21,
+                                  ),
                                 );
                         },
                       ),
@@ -357,18 +386,5 @@ class ContenedorComida extends StatelessWidget {
               ],
             ),
           );
-  }
-}
-
-Future<String> getComidasHttps() async {
-  try {
-    print("OBTENIENDO INFORMACIÓN...");
-    var response = await Dio().get('https://foodish-api.herokuapp.com/api/');
-    var responseDecoded = await json.decode('$response');
-
-    return ("${responseDecoded['image']}");
-  } catch (Exception) {
-    print("ERROR AL CONSUMIR API");
-    return ("https://foodish-api.herokuapp.com/images/burger/burger9.jpg");
   }
 }
