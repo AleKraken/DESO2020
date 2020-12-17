@@ -1,5 +1,6 @@
 import 'package:comidapp/api/consultasApi.dart';
 import 'package:comidapp/models/comida.dart';
+import 'package:comidapp/models/ingredientFromJson.dart';
 import 'package:comidapp/models/ingrediente.dart';
 import 'package:comidapp/models/mealsFromJson.dart';
 import 'package:path/path.dart';
@@ -23,6 +24,7 @@ class DatabaseProvider {
   static const String TABLE_INGREDIENTE = "Ingrediente";
   static const String COLUMN_IDINGREDIENTE = "idIngrediente";
   static const String COLUMN_NOMBREINGREDIENTE = "nombreIngrediente";
+  static const String COLUMN_RUTAIMAGENINGREDIENTE = "rutaImagenIngrediente";
   static const String COLUMN_FAVORITOINGREDIENTE = "favoritoIngrediente";
 
   //CONSTANTES PARA LA TABLA COMIDA-INGREDIENTE
@@ -74,6 +76,7 @@ class DatabaseProvider {
           "CREATE TABLE IF NOT EXISTS $TABLE_INGREDIENTE ("
           "$COLUMN_IDINGREDIENTE INTEGER NOT NULL,"
           "$COLUMN_NOMBREINGREDIENTE TEXT NOT NULL,"
+          "$COLUMN_RUTAIMAGENINGREDIENTE TEXT,"
           "$COLUMN_FAVORITOINGREDIENTE INTEGER NOT NULL,"
           "PRIMARY KEY ($COLUMN_IDINGREDIENTE AUTOINCREMENT)"
           ");",
@@ -93,17 +96,25 @@ class DatabaseProvider {
           String nombreComida = '"${listaComidas[i].meals[0].strMeal}"';
           String rutaImagen = '"${listaComidas[i].meals[0].strMealThumb}"';
 
-          print("GUARDANDO $i EN BASE");
+          print("GUARDANDO COMIDA $i EN BASE");
           await database.execute("INSERT INTO $TABLE_COMIDA "
               "($COLUMN_NOMBRECOMIDA, $COLUMN_DESCRIPCION, $COLUMN_MINUTOSPREPARACION, $COLUMN_PASOSPREPARACION, $COLUMN_CALORIAS, $COLUMN_RUTAIMAGEN, $COLUMN_FAVORITOCOMIDA)"
               " values ($nombreComida, 'Rica ensaladita para la dieta', 45, '1.- Sírvelo y listo xd', 750, $rutaImagen, 0);");
         }
 
-        /*for (int i = 0; i < 1000; i++) {
+        Ingredient listaIngredientes = await ApiExterna.getIngredientesApi();
+
+        for (int i = 0; i < listaIngredientes.ingredientes.length; i++) {
+          String nombreIngrediente =
+              '"${listaIngredientes.ingredientes[i].strIngredient}"';
+          String rutaImagenIngrediente =
+              '"https://www.themealdb.com/images/ingredients/${listaIngredientes.ingredientes[i].strIngredient}-Small.png"';
+
+          print("GUARDANDO INGREDIENTE $i EN BASE");
           await database.execute("INSERT INTO $TABLE_INGREDIENTE "
-              "($COLUMN_NOMBREINGREDIENTE, $COLUMN_FAVORITOINGREDIENTE)"
-              " values ('Tomate $i', 0);");
-        }*/
+              "($COLUMN_NOMBREINGREDIENTE, $COLUMN_RUTAIMAGENINGREDIENTE, $COLUMN_FAVORITOINGREDIENTE)"
+              " values ($nombreIngrediente, $rutaImagenIngrediente, 0);");
+        }
       },
     );
   }
@@ -138,6 +149,7 @@ class DatabaseProvider {
     var ingredientes = await db.rawQuery("SELECT "
         "$COLUMN_IDINGREDIENTE,"
         "$COLUMN_NOMBREINGREDIENTE,"
+        "$COLUMN_RUTAIMAGENINGREDIENTE,"
         "$COLUMN_FAVORITOINGREDIENTE "
         "FROM $TABLE_INGREDIENTE ");
 

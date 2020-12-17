@@ -225,10 +225,8 @@ class ContenedorComida extends StatelessWidget {
                       borderRadius: BorderRadius.circular(10),
                       child: ProgressiveImage(
                         placeholder: AssetImage('assets/images/platoVacio.jpg'),
-                        // size: 1.87KB
                         thumbnail: NetworkImage(
                             '${listaComidas[7].rutaImagen}/preview'),
-                        // size: 1.29MB
                         image: NetworkImage(
                             '${listaComidas[index - 1].rutaImagen}'),
                         height: 300,
@@ -303,25 +301,10 @@ class ContenedorComida extends StatelessWidget {
                                     size: 21,
                                   ),
                                 )
-                              : Container(
-                                  height: 30,
-                                  width: 30,
-                                  decoration: BoxDecoration(
-                                    color: Theme.of(context).cardColor,
-                                    boxShadow: [
-                                      BoxShadow(
-                                        blurRadius: 6,
-                                        color: Theme.of(context).shadowColor,
-                                        spreadRadius: -2,
-                                      ),
-                                    ],
-                                    borderRadius: BorderRadius.circular(15),
-                                  ),
-                                  child: Icon(
-                                    MdiIcons.clockTimeFourOutline,
-                                    color: Colors.grey,
-                                    size: 21,
-                                  ),
+                              : Icon(
+                                  MdiIcons.clockTimeFourOutline,
+                                  color: Colors.grey,
+                                  size: 21,
                                 );
                         },
                       ),
@@ -358,25 +341,10 @@ class ContenedorComida extends StatelessWidget {
                                     size: 21,
                                   ),
                                 )
-                              : Container(
-                                  height: 30,
-                                  width: 30,
-                                  decoration: BoxDecoration(
-                                    color: Theme.of(context).cardColor,
-                                    boxShadow: [
-                                      BoxShadow(
-                                        blurRadius: 6,
-                                        color: Theme.of(context).shadowColor,
-                                        spreadRadius: -2,
-                                      ),
-                                    ],
-                                    borderRadius: BorderRadius.circular(15),
-                                  ),
-                                  child: Icon(
-                                    MdiIcons.heartOutline,
-                                    color: Colors.grey,
-                                    size: 21,
-                                  ),
+                              : Icon(
+                                  MdiIcons.heartOutline,
+                                  color: Colors.grey,
+                                  size: 21,
                                 );
                         },
                       ),
