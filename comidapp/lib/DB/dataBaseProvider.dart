@@ -1,4 +1,3 @@
-import 'package:comidapp/api/consultasApi.dart';
 import 'package:comidapp/json/JsonGetter.dart';
 import 'package:comidapp/models/comida.dart';
 import 'package:comidapp/json/ingredientFromJson.dart';
@@ -28,7 +27,7 @@ class DatabaseProvider {
   static const String COLUMN_RUTAIMAGENINGREDIENTE = "rutaImagenIngrediente";
   static const String COLUMN_FAVORITOINGREDIENTE = "favoritoIngrediente";
 
-  //CONSTANTES PARA LA TABLA COMIDA-INGREDIENTE
+  //CONSTANTES PARA LA TABLA  COMIDA-INGREDIENTE
   static const String TABLE_COMIDA_HAS_INGREDIENTE = "comidaIngrediente";
   static const String COLUMN_FOREIGN_COMIDA = "comida_idComida";
   static const String COLUMN_FOREIGN_INGREDIENTE = "ingrediente_idIngrediente";
