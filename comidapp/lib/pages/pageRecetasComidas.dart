@@ -226,7 +226,7 @@ class ContenedorComida extends StatelessWidget {
                       child: ProgressiveImage(
                         placeholder: AssetImage('assets/images/platoVacio.jpg'),
                         thumbnail: NetworkImage(
-                            '${listaComidas[7].rutaImagen}/preview'),
+                            '${listaComidas[0].rutaImagen}/preview'),
                         image: NetworkImage(
                             '${listaComidas[index - 1].rutaImagen}'),
                         height: 300,
@@ -242,7 +242,8 @@ class ContenedorComida extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text("${listaComidas[index - 1].nombreComida}",
+                        Text(
+                            "${listaComidas[index - 1].idComida} ${listaComidas[index - 1].nombreComida}",
                             style: Theme.of(context).textTheme.headline2,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis),

@@ -1,8 +1,9 @@
 import 'package:comidapp/api/consultasApi.dart';
+import 'package:comidapp/json/JsonGetter.dart';
 import 'package:comidapp/models/comida.dart';
-import 'package:comidapp/models/ingredientFromJson.dart';
+import 'package:comidapp/json/ingredientFromJson.dart';
 import 'package:comidapp/models/ingrediente.dart';
-import 'package:comidapp/models/mealsFromJson.dart';
+import 'package:comidapp/json/mealsFromJson.dart';
 import 'package:path/path.dart';
 
 import 'package:sqflite/sqflite.dart';
@@ -90,11 +91,12 @@ class DatabaseProvider {
           ");",
         );
 
-        List<Meal> listaComidas = await ApiExterna.getComidasDeApi();
+        //INSERTAR INFORMACION DE COMIDAS
+        Meal listaComidas = await JsonGetter.getComidas();
 
-        for (int i = 0; i < listaComidas.length; i++) {
-          String nombreComida = '"${listaComidas[i].meals[0].strMeal}"';
-          String rutaImagen = '"${listaComidas[i].meals[0].strMealThumb}"';
+        for (int i = 0; i < listaComidas.meals.length; i++) {
+          String nombreComida = '"${listaComidas.meals[i].strMeal}"';
+          String rutaImagen = '"${listaComidas.meals[i].strMealThumb}"';
 
           print("GUARDANDO COMIDA $i EN BASE");
           await database.execute("INSERT INTO $TABLE_COMIDA "
@@ -102,7 +104,8 @@ class DatabaseProvider {
               " values ($nombreComida, 'Rica ensaladita para la dieta', 45, '1.- Sírvelo y listo xd', 750, $rutaImagen, 0);");
         }
 
-        Ingredient listaIngredientes = await ApiExterna.getIngredientesApi();
+        //INSERTAR INFORMACIÓN DE INGREDIENTES
+        Ingredient listaIngredientes = await JsonGetter.getIngredientes();
 
         for (int i = 0; i < listaIngredientes.ingredientes.length; i++) {
           String nombreIngrediente =

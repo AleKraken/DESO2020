@@ -1,11 +1,13 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:comidapp/DB/dataBaseProvider.dart';
 import 'package:comidapp/models/ingrediente.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:like_button/like_button.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-import 'package:progressive_image/progressive_image.dart';
+import 'package:octo_image/octo_image.dart';
 
 class Ingredientes extends StatefulWidget {
   Ingredientes({Key key}) : super(key: key);
@@ -39,25 +41,6 @@ class _IngredientesState extends State<Ingredientes> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).backgroundColor,
-      appBar: AppBar(
-        toolbarHeight: 35,
-        title: Center(
-          child: Text("Ingredientes",
-              style: Theme.of(context).textTheme.headline1),
-        ),
-        flexibleSpace: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
-              colors: [
-                Color(0xFFFBB45C),
-                Color(0xFFFE7A66),
-              ],
-            ),
-          ),
-        ),
-      ),
       body: Center(
         child: Container(
           child: FutureBuilder(
@@ -75,12 +58,7 @@ class _IngredientesState extends State<Ingredientes> {
                   ),
                 );
               } else {
-                return SafeArea(
-                  child: Padding(
-                    padding: EdgeInsets.only(top: 5),
-                    child: ListaContenedoresIngredientes(listaIngredientes),
-                  ),
-                );
+                return SliverSuperior(listaIngredientes);
               }
             },
           ),
@@ -88,6 +66,89 @@ class _IngredientesState extends State<Ingredientes> {
       ),
     );
   }
+}
+
+class SliverSuperior extends StatelessWidget {
+  final List<Ingrediente> listaIngredientes;
+
+  const SliverSuperior(this.listaIngredientes);
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomScrollView(
+      physics: BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+      slivers: <Widget>[
+        SliverAppBar(
+          pinned: true,
+          expandedHeight: 180.0,
+          elevation: 20,
+          automaticallyImplyLeading: false,
+          backgroundColor: Theme.of(context).backgroundColor,
+          shadowColor: Colors.black,
+          flexibleSpace: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+                colors: [
+                  Color(0xFFFBB45C),
+                  Color(0xFFFE7A66),
+                ],
+              ),
+            ),
+            child: FlexibleSpaceBar(
+              centerTitle: true,
+              title: Container(
+                alignment: Alignment.bottomCenter,
+                child: Text("Ingredientes recomendados",
+                    maxLines: 1,
+                    textAlign: TextAlign.center,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context)
+                        .textTheme
+                        .headline1
+                        .copyWith(color: Colors.white)),
+              ),
+              background: Stack(
+                alignment: Alignment.bottomCenter,
+                children: [
+                  Container(
+                    decoration: new BoxDecoration(
+                      image: new DecorationImage(
+                        image: new AssetImage(
+                            'assets/images/ingredientesPortada.jpg'),
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        SliverToBoxAdapter(
+          child: Divider(color: Colors.transparent, height: 35),
+        ),
+        SliverGrid(
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisSpacing: 0, mainAxisSpacing: 45, crossAxisCount: 3),
+          delegate: SliverChildListDelegate(
+            getContenedores(listaIngredientes),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+getContenedores(List<Ingrediente> listaIngredientes) {
+  List<Widget> listaContenedores = new List<Widget>();
+
+  for (int i = 0; i < listaIngredientes.length; i++) {
+    listaContenedores.add(ContenedorIngrediente(i, listaIngredientes));
+  }
+
+  return listaContenedores;
 }
 
 class ListaContenedoresIngredientes extends StatelessWidget {
@@ -127,14 +188,39 @@ class ListaContenedoresIngredientes extends StatelessWidget {
   }
 }
 
+Color getColor(int index) {
+  Color color = new Color(0xFFFBB45C);
+
+  if (index % 6 == 0) {
+    color = Color(0xFF45AAB4);
+  } else {
+    if (index % 5 == 0) {
+      color = Color(0xFFF9637C);
+    } else {
+      if (index % 4 == 0) {
+        color = Color(0xFF038DB2);
+      } else {
+        if (index % 3 == 0) {
+          color = Color(0xFFFE7A66);
+        } else {
+          if (index % 2 == 0) {
+            color = Color(0xFF206491);
+          }
+        }
+      }
+    }
+  }
+  return color;
+}
+
 class SearchBar extends StatelessWidget {
   const SearchBar({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Container(
+      height: 100,
       alignment: Alignment.topCenter,
-      height: 60,
       padding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -185,49 +271,71 @@ class ContenedorIngrediente extends StatelessWidget {
       decoration: BoxDecoration(
         boxShadow: [
           BoxShadow(
-            blurRadius: 13,
+            blurRadius: 10,
             color: Theme.of(context).shadowColor,
             offset: const Offset(0, 4),
-            spreadRadius: -6,
+            spreadRadius: 0,
           ),
         ],
         borderRadius: BorderRadius.circular(10),
-        color: Theme.of(context).cardColor,
+        color: getColor(index),
       ),
       margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 0),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Container(
-            padding: EdgeInsets.symmetric(horizontal: 3, vertical: 5),
+            padding: EdgeInsets.symmetric(horizontal: 3, vertical: 0),
             child: Text("${listaIngredientes[index].nombreIngrediente}",
-                style: Theme.of(context).textTheme.headline2,
+                style: Theme.of(context)
+                    .textTheme
+                    .headline1
+                    .copyWith(color: Colors.white),
                 textScaleFactor: .8,
                 maxLines: 2,
                 textAlign: TextAlign.center,
                 overflow: TextOverflow.ellipsis),
           ),
           Container(
-            margin: EdgeInsets.symmetric(vertical: 8),
             height: 50,
             width: 50,
+            decoration: BoxDecoration(
+              boxShadow: [
+                BoxShadow(
+                  blurRadius: 20,
+                  color: Colors.black,
+                  offset: const Offset(0, 22),
+                  spreadRadius: -14,
+                ),
+              ],
+            ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(10),
-              child: ProgressiveImage(
+              child: FadeInImage(
+                imageErrorBuilder: (BuildContext context, Object exception,
+                    StackTrace stackTrace) {
+                  print('Error Handler');
+                  return Container(
+                    width: 100.0,
+                    height: 100.0,
+                    child: Image.asset('assets/images/ingredienteCargando.png'),
+                  );
+                },
                 placeholder:
                     AssetImage('assets/images/ingredienteCargando.png'),
-                thumbnail: AssetImage('assets/images/ingredienteCargando.png'),
-                image: NetworkImage(
-                    '${listaIngredientes[index].rutaImagenIngrediente}'),
-                height: 300,
-                width: 500,
+                image: index > 534
+                    ? AssetImage('assets/images/ingredienteCargando.png')
+                    : NetworkImage(
+                        '${listaIngredientes[index].rutaImagenIngrediente}'),
+                fit: BoxFit.cover,
+                height: 100.0,
+                width: 100.0,
               ),
             ),
           ),
           Container(
-            padding: EdgeInsets.symmetric(vertical: 3),
             decoration: BoxDecoration(
-              color: Colors.black.withOpacity(.05),
+              color: Colors.black.withOpacity(.5),
               borderRadius: BorderRadius.only(
                 bottomLeft: Radius.circular(10),
                 bottomRight: Radius.circular(10),
@@ -246,29 +354,14 @@ class ContenedorIngrediente extends StatelessWidget {
                   ),
                   likeBuilder: (bool isLiked) {
                     return isLiked
-                        ? Container(
-                            height: 30,
-                            width: 30,
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).cardColor,
-                              boxShadow: [
-                                BoxShadow(
-                                  blurRadius: 6,
-                                  color: Theme.of(context).shadowColor,
-                                  spreadRadius: -2,
-                                ),
-                              ],
-                              borderRadius: BorderRadius.circular(15),
-                            ),
-                            child: Icon(
-                              MdiIcons.clockCheck,
-                              color: Theme.of(context).iconTheme.color,
-                              size: 21,
-                            ),
+                        ? Icon(
+                            MdiIcons.thumbDown,
+                            color: Theme.of(context).iconTheme.color,
+                            size: 21,
                           )
                         : Icon(
-                            MdiIcons.clockTimeFourOutline,
-                            color: Colors.grey,
+                            MdiIcons.thumbDownOutline,
+                            color: Colors.white,
                             size: 21,
                           );
                   },
@@ -283,29 +376,14 @@ class ContenedorIngrediente extends StatelessWidget {
                   ),
                   likeBuilder: (bool isLiked) {
                     return isLiked
-                        ? Container(
-                            height: 30,
-                            width: 30,
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).cardColor,
-                              boxShadow: [
-                                BoxShadow(
-                                  blurRadius: 6,
-                                  color: Theme.of(context).shadowColor,
-                                  spreadRadius: -2,
-                                ),
-                              ],
-                              borderRadius: BorderRadius.circular(15),
-                            ),
-                            child: Icon(
-                              MdiIcons.heart,
-                              color: Colors.red,
-                              size: 21,
-                            ),
+                        ? Icon(
+                            MdiIcons.heart,
+                            color: Colors.red,
+                            size: 21,
                           )
                         : Icon(
                             MdiIcons.heartOutline,
-                            color: Colors.grey,
+                            color: Colors.white,
                             size: 21,
                           );
                   },
@@ -316,5 +394,30 @@ class ContenedorIngrediente extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+class ImagenIngrediente extends StatelessWidget {
+  final String rutaImagen;
+  const ImagenIngrediente(this.rutaImagen);
+
+  @override
+  Widget build(BuildContext context) {
+    try {
+      return CachedNetworkImage(
+        useOldImageOnUrlChange: true,
+        imageUrl: rutaImagen,
+        placeholder: (context, url) => CircularProgressIndicator(),
+        errorWidget: (context, url, error) {
+          return Image(
+            image: AssetImage("assets/images/ingredienteCargando.png"),
+          );
+        },
+      );
+    } catch (e) {
+      return Image(
+        image: AssetImage("assets/images/ingredienteCargando.png"),
+      );
+    }
   }
 }

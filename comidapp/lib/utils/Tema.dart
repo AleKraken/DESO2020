@@ -41,7 +41,7 @@ ThemeData temaPrincipal() {
       size: 21,
     ),
     shadowColor: Colors.grey,
-    cardColor: Colors.white,
+    cardColor: Color(0xFFFFFFFF),
     indicatorColor: Colors.blue,
     appBarTheme: AppBarTheme(
       textTheme: TextTheme(headline1: base.textTheme.headline1),

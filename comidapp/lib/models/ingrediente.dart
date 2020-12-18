@@ -31,7 +31,7 @@ class Ingrediente {
   }
 
   Ingrediente.fromMap(Map<String, dynamic> map) {
-    idIngrediente = map[DatabaseProvider.COLUMN_IDCOMIDA];
+    idIngrediente = map[DatabaseProvider.COLUMN_IDINGREDIENTE];
     nombreIngrediente = map[DatabaseProvider.COLUMN_NOMBREINGREDIENTE];
     rutaImagenIngrediente = map[DatabaseProvider.COLUMN_RUTAIMAGENINGREDIENTE];
     favoritoIngrediente = map[DatabaseProvider.COLUMN_FAVORITOINGREDIENTE];

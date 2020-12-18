@@ -1,7 +1,7 @@
 import 'dart:convert';
 
-import 'package:comidapp/models/ingredientFromJson.dart';
-import 'package:comidapp/models/mealsFromJson.dart';
+import 'package:comidapp/json/ingredientFromJson.dart';
+import 'package:comidapp/json/mealsFromJson.dart';
 import 'package:http/http.dart' as http;
 
 class ApiExterna {

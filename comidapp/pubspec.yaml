@@ -38,7 +38,8 @@ dependencies:
   like_button: ^1.0.4
   http: ^0.12.2
   progressive_image: ^1.0.1
-
+  octo_image: ^0.3.0
+  cached_network_image: ^2.4.1
 
 
 dev_dependencies:
@@ -59,6 +60,8 @@ flutter:
 
   assets:
     - assets/images/
+    - assets/jsons/ingredienteJson.json
+    - assets/jsons/comidaJson.json
 
   # To add assets to your application, add an assets section, like this:
   # assets:
