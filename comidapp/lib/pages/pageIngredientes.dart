@@ -29,9 +29,11 @@ class _IngredientesState extends State<Ingredientes> {
   Future _getIngredientes() async {
     await DatabaseProvider.db.getIngredientes().then(
       (lIngredientes) {
-        setState(() {
-          listaIngredientes = lIngredientes;
-        });
+        if (this.mounted) {
+          setState(() {
+            listaIngredientes = lIngredientes;
+          });
+        }
       },
     );
     return Future.delayed(Duration.zero);
