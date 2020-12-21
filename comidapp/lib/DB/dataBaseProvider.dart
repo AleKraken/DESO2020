@@ -28,7 +28,7 @@ class DatabaseProvider {
   static const String COLUMN_FAVORITOINGREDIENTE = "favoritoIngrediente";
 
   //CONSTANTES PARA LA TABLA  COMIDA-INGREDIENTE
-  static const String TABLE_COMIDA_HAS_INGREDIENTE = "comidaIngrediente";
+  static const String TABLE_COMIDA_HAS_INGREDIENTE = "ComidaHasIngrediente";
   static const String COLUMN_FOREIGN_COMIDA = "comida_idComida";
   static const String COLUMN_FOREIGN_INGREDIENTE = "ingrediente_idIngrediente";
 
@@ -57,6 +57,7 @@ class DatabaseProvider {
         print("Creando Tablas");
 
         //TABLA DE COMIDAS
+        print("CREANDO TABLA COMIDA");
         await database.execute(
           "CREATE TABLE IF NOT EXISTS $TABLE_COMIDA ("
           "$COLUMN_IDCOMIDA INTEGER NOT NULL,"
@@ -72,6 +73,7 @@ class DatabaseProvider {
         );
 
         //TABLA DE INGREDIENTES
+        print("CREANDO TABLA INGREDIENTES");
         await database.execute(
           "CREATE TABLE IF NOT EXISTS $TABLE_INGREDIENTE ("
           "$COLUMN_IDINGREDIENTE INTEGER NOT NULL,"
@@ -83,6 +85,7 @@ class DatabaseProvider {
         );
 
         //TABLA COMIDAS-INGREDIENTES
+        print("CREANDO TABLA COMIDAS-INGREDIENTES");
         await database.execute(
           "CREATE TABLE IF NOT EXISTS $TABLE_COMIDA_HAS_INGREDIENTE ("
           "$COLUMN_FOREIGN_COMIDA INTEGER,"
@@ -94,6 +97,7 @@ class DatabaseProvider {
         Meal listaComidas = await JsonGetter.getComidas();
 
         for (int i = 0; i < listaComidas.meals.length; i++) {
+          print("INSERTANDO COMIDA $i");
           String nombreComida = '"${listaComidas.meals[i].strMeal}"';
           String rutaImagen = '"${listaComidas.meals[i].strMealThumb}"';
 
@@ -107,6 +111,7 @@ class DatabaseProvider {
         Ingredient listaIngredientes = await JsonGetter.getIngredientes();
 
         for (int i = 0; i < listaIngredientes.ingredientes.length; i++) {
+          print("INSERTANDO INGREDIENTE $i");
           String nombreIngrediente =
               '"${listaIngredientes.ingredientes[i].strIngredient}"';
           String rutaImagenIngrediente =
@@ -116,6 +121,93 @@ class DatabaseProvider {
           await database.execute("INSERT INTO $TABLE_INGREDIENTE "
               "($COLUMN_NOMBREINGREDIENTE, $COLUMN_RUTAIMAGENINGREDIENTE, $COLUMN_FAVORITOINGREDIENTE)"
               " values ($nombreIngrediente, $rutaImagenIngrediente, 0);");
+        }
+
+        int getIdIngrediente(int indexComida, int indexIngrediente) {
+          switch (indexIngrediente) {
+            case 1:
+              return listaComidas.meals[indexComida].idIngredient1;
+              break;
+            case 2:
+              return listaComidas.meals[indexComida].idIngredient2;
+              break;
+            case 3:
+              return listaComidas.meals[indexComida].idIngredient3;
+              break;
+            case 4:
+              return listaComidas.meals[indexComida].idIngredient4;
+              break;
+            case 5:
+              return listaComidas.meals[indexComida].idIngredient5;
+              break;
+            case 6:
+              return listaComidas.meals[indexComida].idIngredient6;
+              break;
+            case 7:
+              return listaComidas.meals[indexComida].idIngredient7;
+              break;
+            case 8:
+              return listaComidas.meals[indexComida].idIngredient8;
+              break;
+            case 9:
+              return listaComidas.meals[indexComida].idIngredient9;
+              break;
+            case 10:
+              return listaComidas.meals[indexComida].idIngredient10;
+              break;
+            case 11:
+              return listaComidas.meals[indexComida].idIngredient11;
+              break;
+            case 12:
+              return listaComidas.meals[indexComida].idIngredient12;
+              break;
+            case 13:
+              return listaComidas.meals[indexComida].idIngredient13;
+              break;
+            case 14:
+              return listaComidas.meals[indexComida].idIngredient14;
+              break;
+            case 15:
+              return listaComidas.meals[indexComida].idIngredient15;
+              break;
+            case 16:
+              return listaComidas.meals[indexComida].idIngredient16;
+              break;
+            case 17:
+              return listaComidas.meals[indexComida].idIngredient17;
+              break;
+            case 18:
+              return listaComidas.meals[indexComida].idIngredient18;
+              break;
+            case 19:
+              return listaComidas.meals[indexComida].idIngredient19;
+              break;
+            case 20:
+              return listaComidas.meals[indexComida].idIngredient20;
+              break;
+
+            case 0:
+              return 0;
+              break;
+          }
+          return 0;
+        }
+
+        //INSERTAR EN LA TABLA COMIDA_HAS_INGREDIENTE
+        int y = 0;
+        for (int i = 0; i < listaComidas.meals.length; i++) {
+          y = 0;
+          while (y < 20) {
+            print(
+                "INSERTANDO INGREDIENTE ${y + 1} en COMIDA ${i + 1} en COMIDA-INGREDIENTE");
+            int idIngrediente = getIdIngrediente(i, y + 1);
+            idIngrediente != null ??
+                await database
+                    .execute("INSERT INTO $TABLE_COMIDA_HAS_INGREDIENTE "
+                        "($COLUMN_FOREIGN_COMIDA, $COLUMN_FOREIGN_INGREDIENTE)"
+                        " values (${i + 1}, $idIngrediente);");
+            y++;
+          }
         }
       },
     );
@@ -137,8 +229,23 @@ class DatabaseProvider {
 
     List<Comida> listaComidas = List<Comida>();
 
-    comidas.forEach((comidaActual) {
+    comidas.forEach((comidaActual) async {
       Comida comida = Comida.fromMap(comidaActual);
+
+/*
+      var listaIdsIngredientes = await db.rawQuery("SELECT "
+          "$COLUMN_FOREIGN_INGREDIENTE "
+          "FROM $TABLE_COMIDA_HAS_INGREDIENTE "
+          "WHERE ${comida.idComida} = $COLUMN_FOREIGN_COMIDA");
+
+      List<int> listaIngsEnComida = new List<int>();
+      for (int i = 0; i < listaIdsIngredientes.length; i++) {
+        listaIngsEnComida
+            .add(listaIdsIngredientes[i]['ingrediente_idIngrediente']);
+      }
+      comida.setListaIngredientesEnComida(listaIngsEnComida);
+
+      */
       listaComidas.add(comida);
     });
 
@@ -161,6 +268,13 @@ class DatabaseProvider {
       Ingrediente ingrediente = Ingrediente.fromMap(ingredienteActual);
       listaIngredientes.add(ingrediente);
     });
+
+    for (int x = 0; x < 100; x++) {
+      for (int a = 0; a < 20; a++) {
+        print(
+            "INSERTANDO INGREDIENTE ${a + 1} en COMIDA ${x + 1} en COMIDA-INGREDIENTE");
+      }
+    }
 
     return listaIngredientes;
   }

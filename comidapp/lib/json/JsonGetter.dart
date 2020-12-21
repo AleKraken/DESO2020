@@ -27,15 +27,19 @@ class JsonGetter {
   static Future<Meal> getComidas() async {
     Meal listaComidas = new Meal();
     try {
+      print("INTENTANDO CARGAR JSON");
       final jsonString =
           await rootBundle.loadString("assets/jsons/comidaJson.json");
+      print("JSON CARGADO E INTENTANDO MAPEAR");
 
       Map<String, dynamic> comidaMap = await jsonDecode(jsonString);
+      print("MAPEADO LISTO");
       Meal comidas = Meal.fromJson(comidaMap);
+      print("LISTA LISTA");
 
       listaComidas = comidas;
     } catch (Exception) {
-      print("ERROR AL CONSUMIR API EN INGREDIENTE");
+      print("ERROR AL CONSUMIR API EN COMIDA");
       return new Meal();
     }
 

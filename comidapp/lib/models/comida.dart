@@ -11,6 +11,7 @@ class Comida {
   int calorias;
   String rutaImagen;
   int favoritoComida;
+  List<int> listaIngredientesEnComida;
 
   Comida({
     this.idComida,
@@ -22,6 +23,10 @@ class Comida {
     this.rutaImagen,
     this.favoritoComida,
   });
+
+  void setListaIngredientesEnComida(List<int> listaIngs) {
+    listaIngredientesEnComida = listaIngs;
+  }
 
   Map<String, dynamic> toMap() {
     var map = <String, dynamic>{

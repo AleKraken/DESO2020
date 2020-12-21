@@ -177,190 +177,163 @@ class ContenedorComida extends StatelessWidget {
         ? SearchBar()
         : Container(
             height: 85,
-            decoration: BoxDecoration(
-              boxShadow: [
-                BoxShadow(
-                  blurRadius: 13,
-                  color: Theme.of(context).shadowColor,
-                  offset: const Offset(0, 4),
-                  spreadRadius: -10,
-                ),
-              ],
-              borderRadius: BorderRadius.circular(10),
-              color: Theme.of(context).cardColor,
-            ),
             margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 25),
-            child: FlatButton(
-              padding: EdgeInsets.all(0),
-              onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        DetallesComida(listaComidas[index - 1], index),
-                  ),
-                );
-              },
-              child: Row(
-                children: [
-                  Container(
-                    height: 85,
-                    width: 100,
-                    decoration: BoxDecoration(
-                      boxShadow: [
-                        BoxShadow(
-                          blurRadius: 13,
-                          color: Theme.of(context).shadowColor,
-                          offset: const Offset(-3, 0),
-                          spreadRadius: -5,
+            child: Row(
+              children: [
+                Expanded(
+                  child: FlatButton(
+                    padding: EdgeInsets.all(0),
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              DetallesComida(listaComidas[index - 1], index),
+                        ),
+                      );
+                    },
+                    child: Row(
+                      children: [
+                        Container(
+                          height: 85,
+                          width: 100,
+                          decoration: BoxDecoration(
+                            boxShadow: [
+                              BoxShadow(
+                                blurRadius: 13,
+                                color: Theme.of(context).shadowColor,
+                                offset: const Offset(-3, 0),
+                                spreadRadius: -5,
+                              ),
+                            ],
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          child: Container(
+                            height: 60,
+                            width: 60,
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).backgroundColor,
+                              borderRadius: BorderRadius.circular(10),
+                              boxShadow: [
+                                BoxShadow(
+                                  blurRadius: 13,
+                                  color: Theme.of(context).shadowColor,
+                                  offset: const Offset(-1, 0),
+                                  spreadRadius: -1,
+                                ),
+                              ],
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: Hero(
+                                tag: 'heroImagen$index',
+                                child: FadeInImage(
+                                  placeholder: AssetImage(
+                                      'assets/images/comidaCargando.jpg'),
+                                  image: NetworkImage(
+                                    '${listaComidas[index - 1].rutaImagen}',
+                                  ),
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 5),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text("${listaComidas[index - 1].nombreComida}",
+                                    style:
+                                        Theme.of(context).textTheme.headline2,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis),
+                                Divider(height: 3),
+                                Text("6 ingredientes",
+                                    style:
+                                        Theme.of(context).textTheme.subtitle2,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis),
+                                Divider(height: 3, color: Colors.transparent),
+                                Text(
+                                    "${listaComidas[index - 1].calorias} calorías",
+                                    style:
+                                        Theme.of(context).textTheme.subtitle2,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis),
+                                Divider(height: 3, color: Colors.transparent),
+                                Text(
+                                    "${listaComidas[index - 1].minutosPreparacion} minutos",
+                                    style:
+                                        Theme.of(context).textTheme.subtitle2,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis),
+                              ],
+                            ),
+                          ),
                         ),
                       ],
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    child: Container(
-                      height: 60,
-                      width: 60,
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).cardColor,
-                        borderRadius: BorderRadius.circular(10),
-                        boxShadow: [
-                          BoxShadow(
-                            blurRadius: 13,
-                            color: Theme.of(context).shadowColor,
-                            offset: const Offset(-1, 0),
-                            spreadRadius: -1,
-                          ),
-                        ],
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: Hero(
-                          tag: 'heroImagen$index',
-                          child: Image.network(
-                            '${listaComidas[index - 1].rutaImagen}',
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
                     ),
                   ),
-                  Expanded(
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 5),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text("${listaComidas[index - 1].nombreComida}",
-                              style: Theme.of(context).textTheme.headline2,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis),
-                          Divider(height: 3),
-                          Text("6 ingredientes",
-                              style: Theme.of(context).textTheme.subtitle2,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis),
-                          Divider(height: 3, color: Colors.transparent),
-                          Text("${listaComidas[index - 1].calorias} calorías",
-                              style: Theme.of(context).textTheme.subtitle2,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis),
-                          Divider(height: 3, color: Colors.transparent),
-                          Text(
-                              "${listaComidas[index - 1].minutosPreparacion} minutos",
-                              style: Theme.of(context).textTheme.subtitle2,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis),
-                        ],
+                ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.only(right: 7),
+                      child: LikeButton(
+                        size: 28,
+                        circleColor: CircleColor(
+                            start: Color(0xFFFBB45C), end: Color(0xFFFBB45C)),
+                        bubblesColor: BubblesColor(
+                          dotPrimaryColor: Color(0xFFFBB45C),
+                          dotSecondaryColor: Color(0xFFF9637C),
+                        ),
+                        likeBuilder: (bool isLiked) {
+                          return isLiked
+                              ? Icon(
+                                  MdiIcons.clockCheck,
+                                  color: Theme.of(context).iconTheme.color,
+                                  size: 21,
+                                )
+                              : Icon(
+                                  MdiIcons.clockTimeFourOutline,
+                                  color: Colors.black45,
+                                  size: 21,
+                                );
+                        },
                       ),
                     ),
-                  ),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.only(right: 7),
-                        child: LikeButton(
-                          size: 28,
-                          circleColor: CircleColor(
-                              start: Color(0xFFFBB45C), end: Color(0xFFFBB45C)),
-                          bubblesColor: BubblesColor(
-                            dotPrimaryColor: Color(0xFFFBB45C),
-                            dotSecondaryColor: Color(0xFFF9637C),
-                          ),
-                          likeBuilder: (bool isLiked) {
-                            return isLiked
-                                ? Container(
-                                    height: 30,
-                                    width: 30,
-                                    decoration: BoxDecoration(
-                                      color: Theme.of(context).cardColor,
-                                      boxShadow: [
-                                        BoxShadow(
-                                          blurRadius: 6,
-                                          color: Theme.of(context).shadowColor,
-                                          spreadRadius: -2,
-                                        ),
-                                      ],
-                                      borderRadius: BorderRadius.circular(15),
-                                    ),
-                                    child: Icon(
-                                      MdiIcons.clockCheck,
-                                      color: Theme.of(context).iconTheme.color,
-                                      size: 21,
-                                    ),
-                                  )
-                                : Icon(
-                                    MdiIcons.clockTimeFourOutline,
-                                    color: Colors.grey,
-                                    size: 21,
-                                  );
-                          },
+                    Padding(
+                      padding: EdgeInsets.only(right: 7),
+                      child: LikeButton(
+                        size: 28,
+                        circleColor: CircleColor(
+                            start: Color(0xFFFBB45C), end: Color(0xFFFBB45C)),
+                        bubblesColor: BubblesColor(
+                          dotPrimaryColor: Color(0xFFFBB45C),
+                          dotSecondaryColor: Color(0xFFF9637C),
                         ),
+                        likeBuilder: (bool isLiked) {
+                          return isLiked
+                              ? Icon(
+                                  MdiIcons.heart,
+                                  color: Colors.red,
+                                  size: 21,
+                                )
+                              : Icon(
+                                  MdiIcons.heartOutline,
+                                  color: Colors.black45,
+                                  size: 21,
+                                );
+                        },
                       ),
-                      Padding(
-                        padding: EdgeInsets.only(right: 7),
-                        child: LikeButton(
-                          size: 28,
-                          circleColor: CircleColor(
-                              start: Color(0xFFFBB45C), end: Color(0xFFFBB45C)),
-                          bubblesColor: BubblesColor(
-                            dotPrimaryColor: Color(0xFFFBB45C),
-                            dotSecondaryColor: Color(0xFFF9637C),
-                          ),
-                          likeBuilder: (bool isLiked) {
-                            return isLiked
-                                ? Container(
-                                    height: 30,
-                                    width: 30,
-                                    decoration: BoxDecoration(
-                                      color: Theme.of(context).cardColor,
-                                      boxShadow: [
-                                        BoxShadow(
-                                          blurRadius: 6,
-                                          color: Theme.of(context).shadowColor,
-                                          spreadRadius: -2,
-                                        ),
-                                      ],
-                                      borderRadius: BorderRadius.circular(15),
-                                    ),
-                                    child: Icon(
-                                      MdiIcons.heart,
-                                      color: Colors.red,
-                                      size: 21,
-                                    ),
-                                  )
-                                : Icon(
-                                    MdiIcons.heartOutline,
-                                    color: Colors.grey,
-                                    size: 21,
-                                  );
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           );
   }

@@ -14,6 +14,7 @@ ThemeData temaPrincipal() {
           fontFamily: GoogleFonts.baiJamjuree().fontFamily,
           fontSize: 16.0,
           color: Colors.black,
+          fontWeight: FontWeight.bold,
         ),
         subtitle1: base.headline1.copyWith(
           fontFamily: GoogleFonts.baiJamjuree().fontFamily,

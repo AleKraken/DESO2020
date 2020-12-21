@@ -24,33 +24,33 @@ class Meal {
 class Meals {
   String idMeal;
   String strMeal;
-  Null strDrinkAlternate;
+  String strDrinkAlternate;
   String strCategory;
   String strArea;
   String strInstructions;
   String strMealThumb;
   String strTags;
   String strYoutube;
-  String strIngredient1;
-  String strIngredient2;
-  String strIngredient3;
-  String strIngredient4;
-  String strIngredient5;
-  String strIngredient6;
-  String strIngredient7;
-  String strIngredient8;
-  String strIngredient9;
-  String strIngredient10;
-  String strIngredient11;
-  String strIngredient12;
-  String strIngredient13;
-  String strIngredient14;
-  String strIngredient15;
-  String strIngredient16;
-  String strIngredient17;
-  String strIngredient18;
-  String strIngredient19;
-  String strIngredient20;
+  int idIngredient1;
+  int idIngredient2;
+  int idIngredient3;
+  int idIngredient4;
+  int idIngredient5;
+  int idIngredient6;
+  int idIngredient7;
+  int idIngredient8;
+  int idIngredient9;
+  int idIngredient10;
+  int idIngredient11;
+  int idIngredient12;
+  int idIngredient13;
+  int idIngredient14;
+  int idIngredient15;
+  int idIngredient16;
+  int idIngredient17;
+  int idIngredient18;
+  int idIngredient19;
+  int idIngredient20;
   String strMeasure1;
   String strMeasure2;
   String strMeasure3;
@@ -84,26 +84,26 @@ class Meals {
       this.strMealThumb,
       this.strTags,
       this.strYoutube,
-      this.strIngredient1,
-      this.strIngredient2,
-      this.strIngredient3,
-      this.strIngredient4,
-      this.strIngredient5,
-      this.strIngredient6,
-      this.strIngredient7,
-      this.strIngredient8,
-      this.strIngredient9,
-      this.strIngredient10,
-      this.strIngredient11,
-      this.strIngredient12,
-      this.strIngredient13,
-      this.strIngredient14,
-      this.strIngredient15,
-      this.strIngredient16,
-      this.strIngredient17,
-      this.strIngredient18,
-      this.strIngredient19,
-      this.strIngredient20,
+      this.idIngredient1,
+      this.idIngredient2,
+      this.idIngredient3,
+      this.idIngredient4,
+      this.idIngredient5,
+      this.idIngredient6,
+      this.idIngredient7,
+      this.idIngredient8,
+      this.idIngredient9,
+      this.idIngredient10,
+      this.idIngredient11,
+      this.idIngredient12,
+      this.idIngredient13,
+      this.idIngredient14,
+      this.idIngredient15,
+      this.idIngredient16,
+      this.idIngredient17,
+      this.idIngredient18,
+      this.idIngredient19,
+      this.idIngredient20,
       this.strMeasure1,
       this.strMeasure2,
       this.strMeasure3,
@@ -137,26 +137,26 @@ class Meals {
     strMealThumb = json['strMealThumb'];
     strTags = json['strTags'];
     strYoutube = json['strYoutube'];
-    strIngredient1 = json['strIngredient1'];
-    strIngredient2 = json['strIngredient2'];
-    strIngredient3 = json['strIngredient3'];
-    strIngredient4 = json['strIngredient4'];
-    strIngredient5 = json['strIngredient5'];
-    strIngredient6 = json['strIngredient6'];
-    strIngredient7 = json['strIngredient7'];
-    strIngredient8 = json['strIngredient8'];
-    strIngredient9 = json['strIngredient9'];
-    strIngredient10 = json['strIngredient10'];
-    strIngredient11 = json['strIngredient11'];
-    strIngredient12 = json['strIngredient12'];
-    strIngredient13 = json['strIngredient13'];
-    strIngredient14 = json['strIngredient14'];
-    strIngredient15 = json['strIngredient15'];
-    strIngredient16 = json['strIngredient16'];
-    strIngredient17 = json['strIngredient17'];
-    strIngredient18 = json['strIngredient18'];
-    strIngredient19 = json['strIngredient19'];
-    strIngredient20 = json['strIngredient20'];
+    idIngredient1 = json['idIngredient1'];
+    idIngredient2 = json['idIngredient2'];
+    idIngredient3 = json['idIngredient3'];
+    idIngredient4 = json['idIngredient4'];
+    idIngredient5 = json['idIngredient5'];
+    idIngredient6 = json['idIngredient6'];
+    idIngredient7 = json['idIngredient7'];
+    idIngredient8 = json['idIngredient8'];
+    idIngredient9 = json['idIngredient9'];
+    idIngredient10 = json['idIngredient10'];
+    idIngredient11 = json['idIngredient11'];
+    idIngredient12 = json['idIngredient12'];
+    idIngredient13 = json['idIngredient13'];
+    idIngredient14 = json['idIngredient14'];
+    idIngredient15 = json['idIngredient15'];
+    idIngredient16 = json['idIngredient16'];
+    idIngredient17 = json['idIngredient17'];
+    idIngredient18 = json['idIngredient18'];
+    idIngredient19 = json['idIngredient19'];
+    idIngredient20 = json['idIngredient20'];
     strMeasure1 = json['strMeasure1'];
     strMeasure2 = json['strMeasure2'];
     strMeasure3 = json['strMeasure3'];
@@ -192,26 +192,26 @@ class Meals {
     data['strMealThumb'] = this.strMealThumb;
     data['strTags'] = this.strTags;
     data['strYoutube'] = this.strYoutube;
-    data['strIngredient1'] = this.strIngredient1;
-    data['strIngredient2'] = this.strIngredient2;
-    data['strIngredient3'] = this.strIngredient3;
-    data['strIngredient4'] = this.strIngredient4;
-    data['strIngredient5'] = this.strIngredient5;
-    data['strIngredient6'] = this.strIngredient6;
-    data['strIngredient7'] = this.strIngredient7;
-    data['strIngredient8'] = this.strIngredient8;
-    data['strIngredient9'] = this.strIngredient9;
-    data['strIngredient10'] = this.strIngredient10;
-    data['strIngredient11'] = this.strIngredient11;
-    data['strIngredient12'] = this.strIngredient12;
-    data['strIngredient13'] = this.strIngredient13;
-    data['strIngredient14'] = this.strIngredient14;
-    data['strIngredient15'] = this.strIngredient15;
-    data['strIngredient16'] = this.strIngredient16;
-    data['strIngredient17'] = this.strIngredient17;
-    data['strIngredient18'] = this.strIngredient18;
-    data['strIngredient19'] = this.strIngredient19;
-    data['strIngredient20'] = this.strIngredient20;
+    data['idIngredient1'] = this.idIngredient1;
+    data['idIngredient2'] = this.idIngredient2;
+    data['idIngredient3'] = this.idIngredient3;
+    data['idIngredient4'] = this.idIngredient4;
+    data['idIngredient5'] = this.idIngredient5;
+    data['idIngredient6'] = this.idIngredient6;
+    data['idIngredient7'] = this.idIngredient7;
+    data['idIngredient8'] = this.idIngredient8;
+    data['idIngredient9'] = this.idIngredient9;
+    data['idIngredient10'] = this.idIngredient10;
+    data['idIngredient11'] = this.idIngredient11;
+    data['idIngredient12'] = this.idIngredient12;
+    data['idIngredient13'] = this.idIngredient13;
+    data['idIngredient14'] = this.idIngredient14;
+    data['idIngredient15'] = this.idIngredient15;
+    data['idIngredient16'] = this.idIngredient16;
+    data['idIngredient17'] = this.idIngredient17;
+    data['idIngredient18'] = this.idIngredient18;
+    data['idIngredient19'] = this.idIngredient19;
+    data['idIngredient20'] = this.idIngredient20;
     data['strMeasure1'] = this.strMeasure1;
     data['strMeasure2'] = this.strMeasure2;
     data['strMeasure3'] = this.strMeasure3;
