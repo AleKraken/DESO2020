@@ -1,5 +1,6 @@
 import 'package:comidapp/json/JsonGetter.dart';
 import 'package:comidapp/models/comida.dart';
+import 'package:comidapp/models/comidaHasIngrediente.dart';
 import 'package:comidapp/json/ingredientFromJson.dart';
 import 'package:comidapp/models/ingrediente.dart';
 import 'package:comidapp/json/mealsFromJson.dart';
@@ -198,16 +199,16 @@ class DatabaseProvider {
         for (int i = 0; i < listaComidas.meals.length; i++) {
           y = 0;
           while (y < 20) {
-            print(
-                "INSERTANDO INGREDIENTE ${y + 1} en COMIDA ${i + 1} en COMIDA-INGREDIENTE");
             int idIngrediente = getIdIngrediente(i, y + 1);
-            idIngrediente != null ??
-                await database
-                    .execute("INSERT INTO $TABLE_COMIDA_HAS_INGREDIENTE "
-                        "($COLUMN_FOREIGN_COMIDA, $COLUMN_FOREIGN_INGREDIENTE)"
-                        " values (${i + 1}, $idIngrediente);");
+
+            await database.execute("INSERT INTO $TABLE_COMIDA_HAS_INGREDIENTE "
+                "($COLUMN_FOREIGN_COMIDA, $COLUMN_FOREIGN_INGREDIENTE)"
+                " values (${i + 1}, $idIngrediente);");
+            print("ELEMENTO $y DE $i INSERTADO");
+            await Future.delayed(Duration.zero);
             y++;
           }
+          await Future.delayed(Duration.zero);
         }
       },
     );
@@ -228,26 +229,34 @@ class DatabaseProvider {
         "FROM $TABLE_COMIDA ");
 
     List<Comida> listaComidas = List<Comida>();
-
     comidas.forEach((comidaActual) async {
       Comida comida = Comida.fromMap(comidaActual);
 
-/*
-      var listaIdsIngredientes = await db.rawQuery("SELECT "
-          "$COLUMN_FOREIGN_INGREDIENTE "
-          "FROM $TABLE_COMIDA_HAS_INGREDIENTE "
-          "WHERE ${comida.idComida} = $COLUMN_FOREIGN_COMIDA");
-
-      List<int> listaIngsEnComida = new List<int>();
-      for (int i = 0; i < listaIdsIngredientes.length; i++) {
-        listaIngsEnComida
-            .add(listaIdsIngredientes[i]['ingrediente_idIngrediente']);
-      }
-      comida.setListaIngredientesEnComida(listaIngsEnComida);
-
-      */
       listaComidas.add(comida);
+      await Future.delayed(Duration.zero);
     });
+
+    for (int i = 0; i < listaComidas.length; i++) {
+      listaComidas[i].listaIngredientesEnComida = new List<int>();
+
+      List<Map<String, dynamic>> ingredientesEnComida =
+          await db.rawQuery("SELECT $COLUMN_FOREIGN_INGREDIENTE "
+              "FROM $TABLE_COMIDA_HAS_INGREDIENTE "
+              "WHERE $COLUMN_FOREIGN_COMIDA = ${i + 1}");
+
+      ingredientesEnComida.forEach((ingredienteActual) async {
+        ComidaHasIngrediente ingrediente =
+            ComidaHasIngrediente.fromMap(ingredienteActual);
+
+        if (ingrediente.foreignIdIngrediente != null) {
+          listaComidas[i]
+              .listaIngredientesEnComida
+              .add(ingrediente.foreignIdIngrediente);
+        }
+
+        await Future.delayed(Duration.zero);
+      });
+    }
 
     return listaComidas;
   }
@@ -268,13 +277,6 @@ class DatabaseProvider {
       Ingrediente ingrediente = Ingrediente.fromMap(ingredienteActual);
       listaIngredientes.add(ingrediente);
     });
-
-    for (int x = 0; x < 100; x++) {
-      for (int a = 0; a < 20; a++) {
-        print(
-            "INSERTANDO INGREDIENTE ${a + 1} en COMIDA ${x + 1} en COMIDA-INGREDIENTE");
-      }
-    }
 
     return listaIngredientes;
   }

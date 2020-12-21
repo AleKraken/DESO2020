@@ -251,7 +251,8 @@ class ContenedorComida extends StatelessWidget {
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis),
                                 Divider(height: 3),
-                                Text("6 ingredientes",
+                                Text(
+                                    "${listaComidas[index - 1].listaIngredientesEnComida.length} ingredientes",
                                     style:
                                         Theme.of(context).textTheme.subtitle2,
                                     maxLines: 1,
