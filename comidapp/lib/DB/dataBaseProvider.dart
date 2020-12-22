@@ -33,10 +33,6 @@ class DatabaseProvider {
   static const String COLUMN_FOREIGN_COMIDA = "comida_idComida";
   static const String COLUMN_FOREIGN_INGREDIENTE = "ingrediente_idIngrediente";
 
-  //CONSTANTES PARA LAS TABLAS FAVORITOS
-  static const String TABLE_COMIDA_FAVORITA = "ComidaFavorita";
-  static const String TABLE_INGREDIENTE_FAVORITO = "IngredienteFavorito";
-
   DatabaseProvider._();
   static final DatabaseProvider db = DatabaseProvider._();
 
@@ -94,22 +90,6 @@ class DatabaseProvider {
         await database.execute(
           "CREATE TABLE IF NOT EXISTS $TABLE_COMIDA_HAS_INGREDIENTE ("
           "$COLUMN_FOREIGN_COMIDA INTEGER,"
-          "$COLUMN_FOREIGN_INGREDIENTE INTEGER"
-          ");",
-        );
-
-        //TABLA COMIDAS FAVORITAS
-        print("CREANDO TABLA COMIDAS FAVORITAS");
-        await database.execute(
-          "CREATE TABLE IF NOT EXISTS $TABLE_COMIDA_FAVORITA ("
-          "$COLUMN_FOREIGN_COMIDA INTEGER"
-          ");",
-        );
-
-        //TABLA INGREDIENTES FAVORITOS
-        print("CREANDO TABLA INGREDIENTES FAVORITOS");
-        await database.execute(
-          "CREATE TABLE IF NOT EXISTS $TABLE_INGREDIENTE_FAVORITO ("
           "$COLUMN_FOREIGN_INGREDIENTE INTEGER"
           ");",
         );
@@ -233,27 +213,16 @@ class DatabaseProvider {
     );
   }
 
-  Future insertComidaFavorita(int idComida) async {
+  Future setComidaFavorita(int idComida, int ponerFavorita) async {
     final db = await database;
-    await db.rawInsert("INSERT INTO $TABLE_COMIDA_FAVORITA "
-        " ($COLUMN_FOREIGN_COMIDA)"
-        " VALUES ($idComida);");
-
     return await db.rawUpdate(
-        "UPDATE $TABLE_COMIDA SET $COLUMN_FAVORITOCOMIDA = 1 WHERE $COLUMN_IDCOMIDA =$idComida");
+        "UPDATE $TABLE_COMIDA SET $COLUMN_FAVORITOCOMIDA = $ponerFavorita WHERE $COLUMN_IDCOMIDA =$idComida");
   }
 
-  Future deleteComidaFavorita(int idComida) async {
+  Future setIngredienteFavorito(int idIngrediente, int ponerFavorito) async {
     final db = await database;
-
-    await db.delete(
-      TABLE_COMIDA_FAVORITA,
-      where: "$COLUMN_FOREIGN_COMIDA = ?",
-      whereArgs: [idComida],
-    );
-
     return await db.rawUpdate(
-        "UPDATE $TABLE_COMIDA SET $COLUMN_FAVORITOCOMIDA = 0 WHERE $COLUMN_IDCOMIDA =$idComida");
+        "UPDATE $TABLE_INGREDIENTE SET $COLUMN_FAVORITOINGREDIENTE = $ponerFavorito WHERE $COLUMN_IDINGREDIENTE =$idIngrediente");
   }
 
   Future<List<Comida>> getComidas() async {
@@ -323,20 +292,41 @@ class DatabaseProvider {
     return listaIngredientes;
   }
 
+  Future<List<Ingrediente>> getIngredientesFavoritos() async {
+    final db = await database;
+
+    var ingredientes = await db.rawQuery("SELECT "
+        "$COLUMN_IDINGREDIENTE,"
+        "$COLUMN_NOMBREINGREDIENTE,"
+        "$COLUMN_RUTAIMAGENINGREDIENTE,"
+        "$COLUMN_FAVORITOINGREDIENTE "
+        "FROM $TABLE_INGREDIENTE "
+        "WHERE $COLUMN_FAVORITOINGREDIENTE = 1");
+
+    List<Ingrediente> listaIngredientes = List<Ingrediente>();
+
+    ingredientes.forEach((ingredienteActual) {
+      Ingrediente ingrediente = Ingrediente.fromMap(ingredienteActual);
+      listaIngredientes.add(ingrediente);
+    });
+
+    return listaIngredientes;
+  }
+
   Future<List<Comida>> getComidasFavoritas() async {
     final db = await database;
 
     var comidas = await db.rawQuery("SELECT "
-        "a.$COLUMN_IDCOMIDA,"
-        "a.$COLUMN_NOMBRECOMIDA,"
-        "a.$COLUMN_DESCRIPCION,"
-        "a.$COLUMN_MINUTOSPREPARACION,"
-        "a.$COLUMN_PASOSPREPARACION,"
-        "a.$COLUMN_CALORIAS,"
-        "a.$COLUMN_RUTAIMAGEN,"
-        "a.$COLUMN_FAVORITOCOMIDA "
-        "FROM $TABLE_COMIDA a, $TABLE_COMIDA_FAVORITA b "
-        "WHERE a.$COLUMN_IDCOMIDA = b.$COLUMN_FOREIGN_COMIDA");
+        "$COLUMN_IDCOMIDA,"
+        "$COLUMN_NOMBRECOMIDA,"
+        "$COLUMN_DESCRIPCION,"
+        "$COLUMN_MINUTOSPREPARACION,"
+        "$COLUMN_PASOSPREPARACION,"
+        "$COLUMN_CALORIAS,"
+        "$COLUMN_RUTAIMAGEN,"
+        "$COLUMN_FAVORITOCOMIDA "
+        "FROM $TABLE_COMIDA "
+        "WHERE $COLUMN_FAVORITOCOMIDA = 1");
 
     List<Comida> listaComidas = List<Comida>();
     comidas.forEach((comidaActual) async {

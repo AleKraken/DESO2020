@@ -3,17 +3,18 @@ import 'package:comidapp/models/comida.dart';
 import 'package:comidapp/pages/pageVistaReceta.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:like_button/like_button.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
-class RecetasComidas extends StatefulWidget {
-  RecetasComidas({Key key}) : super(key: key);
+class ComidasFavoritas extends StatefulWidget {
+  ComidasFavoritas({Key key}) : super(key: key);
 
   @override
-  _RecetasComidasState createState() => _RecetasComidasState();
+  _ComidasFavoritasState createState() => _ComidasFavoritasState();
 }
 
-class _RecetasComidasState extends State<RecetasComidas> {
+class _ComidasFavoritasState extends State<ComidasFavoritas> {
   Future _futureComidas;
   List<Comida> listaComidas = new List<Comida>();
 
@@ -24,11 +25,12 @@ class _RecetasComidasState extends State<RecetasComidas> {
   }
 
   Future _getComidas() async {
-    await DatabaseProvider.db.getComidas().then(
+    await DatabaseProvider.db.getComidasFavoritas().then(
       (lComidas) {
         if (this.mounted) {
           setState(() {
             listaComidas = lComidas;
+            print(listaComidas.length);
           });
         }
       },
@@ -36,118 +38,37 @@ class _RecetasComidasState extends State<RecetasComidas> {
     return Future.delayed(Duration.zero);
   }
 
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Theme.of(context).backgroundColor,
-      body: Center(
+    return Container(
+      child: Center(
         child: Container(
           child: FutureBuilder(
-            future: _futureComidas,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return Container(
-                  alignment: Alignment.topCenter,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Center(child: CircularProgressIndicator()),
-                    ],
-                  ),
-                );
-              } else {
-                return SliverSuperior(listaComidas);
-              }
-            },
-          ),
+              future: _futureComidas,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Container(
+                    alignment: Alignment.topCenter,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Center(child: CircularProgressIndicator()),
+                      ],
+                    ),
+                  );
+                } else {
+                  return listaComidas.length > 0
+                      ? ListaContenedoresComidas(listaComidas)
+                      : Container();
+                }
+              }),
         ),
       ),
     );
   }
 }
 
-class SliverSuperior extends StatelessWidget {
-  final List<Comida> listaComidas;
-
-  const SliverSuperior(this.listaComidas);
-
-  @override
-  Widget build(BuildContext context) {
-    return CustomScrollView(
-      physics: BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
-      slivers: <Widget>[
-        SliverAppBar(
-          pinned: true,
-          expandedHeight: 180.0,
-          elevation: 20,
-          automaticallyImplyLeading: false,
-          backgroundColor: Theme.of(context).backgroundColor,
-          shadowColor: Colors.black,
-          flexibleSpace: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.centerLeft,
-                end: Alignment.centerRight,
-                colors: [
-                  Color(0xFFFBB45C),
-                  Color(0xFFFE7A66),
-                ],
-              ),
-            ),
-            child: FlexibleSpaceBar(
-              centerTitle: true,
-              title: Container(
-                alignment: Alignment.bottomCenter,
-                child: Text("Comidas sugeridas",
-                    maxLines: 1,
-                    textAlign: TextAlign.center,
-                    overflow: TextOverflow.ellipsis,
-                    style: Theme.of(context)
-                        .textTheme
-                        .headline1
-                        .copyWith(color: Colors.white)),
-              ),
-              background: Stack(
-                alignment: Alignment.bottomCenter,
-                children: [
-                  Container(
-                    decoration: new BoxDecoration(
-                      image: new DecorationImage(
-                        image:
-                            new AssetImage('assets/images/comidasPortada.jpg'),
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-        SliverToBoxAdapter(
-          child: Divider(color: Colors.transparent, height: 10),
-        ),
-        SliverList(
-          delegate: SliverChildListDelegate(
-            getContenedores(listaComidas),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-getContenedores(List<Comida> listaComidas) {
-  List<Widget> listaContenedores = new List<Widget>();
-
-  for (int i = 0; i < listaComidas.length; i++) {
-    listaContenedores.add(ContenedorComida(i, listaComidas));
-  }
-
-  return listaContenedores;
-}
-
-/*
 class ListaContenedoresComidas extends StatelessWidget {
   final List<Comida> listaComidas;
 
@@ -176,8 +97,6 @@ class ListaContenedoresComidas extends StatelessWidget {
     );
   }
 }
-
-*/
 
 class ContenedorComida extends StatelessWidget {
   final int index;

@@ -1,22 +1,18 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:comidapp/DB/dataBaseProvider.dart';
 import 'package:comidapp/models/ingrediente.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:like_button/like_button.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-import 'package:octo_image/octo_image.dart';
 
-class Ingredientes extends StatefulWidget {
-  Ingredientes({Key key}) : super(key: key);
+class IngredientesFavoritos extends StatefulWidget {
+  IngredientesFavoritos({Key key}) : super(key: key);
 
   @override
-  _IngredientesState createState() => _IngredientesState();
+  _IngredientesFavoritosState createState() => _IngredientesFavoritosState();
 }
 
-class _IngredientesState extends State<Ingredientes> {
+class _IngredientesFavoritosState extends State<IngredientesFavoritos> {
   Future _futureIngredientes;
   List<Ingrediente> listaIngredientes = new List<Ingrediente>();
 
@@ -27,7 +23,7 @@ class _IngredientesState extends State<Ingredientes> {
   }
 
   Future _getIngredientes() async {
-    await DatabaseProvider.db.getIngredientes().then(
+    await DatabaseProvider.db.getIngredientesFavoritos().then(
       (lIngredientes) {
         if (this.mounted) {
           setState(() {
@@ -41,116 +37,33 @@ class _IngredientesState extends State<Ingredientes> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Theme.of(context).backgroundColor,
-      body: Center(
+    return Container(
+      child: Center(
         child: Container(
           child: FutureBuilder(
-            future: _futureIngredientes,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return Container(
-                  alignment: Alignment.topCenter,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Center(child: CircularProgressIndicator()),
-                    ],
-                  ),
-                );
-              } else {
-                return SliverSuperior(listaIngredientes);
-              }
-            },
-          ),
+              future: _futureIngredientes,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Container(
+                    alignment: Alignment.topCenter,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Center(child: CircularProgressIndicator()),
+                      ],
+                    ),
+                  );
+                } else {
+                  return listaIngredientes.length > 0
+                      ? ListaContenedoresIngredientes(listaIngredientes)
+                      : Container();
+                }
+              }),
         ),
       ),
     );
   }
-}
-
-class SliverSuperior extends StatelessWidget {
-  final List<Ingrediente> listaIngredientes;
-
-  const SliverSuperior(this.listaIngredientes);
-
-  @override
-  Widget build(BuildContext context) {
-    return CustomScrollView(
-      physics: BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
-      slivers: <Widget>[
-        SliverAppBar(
-          pinned: true,
-          expandedHeight: 180.0,
-          elevation: 20,
-          automaticallyImplyLeading: false,
-          backgroundColor: Theme.of(context).backgroundColor,
-          shadowColor: Colors.black,
-          flexibleSpace: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.centerLeft,
-                end: Alignment.centerRight,
-                colors: [
-                  Color(0xFFFBB45C),
-                  Color(0xFFFE7A66),
-                ],
-              ),
-            ),
-            child: FlexibleSpaceBar(
-              centerTitle: true,
-              title: Container(
-                alignment: Alignment.bottomCenter,
-                child: Text("Ingredientes recomendados",
-                    maxLines: 1,
-                    textAlign: TextAlign.center,
-                    overflow: TextOverflow.ellipsis,
-                    style: Theme.of(context)
-                        .textTheme
-                        .headline1
-                        .copyWith(color: Colors.white)),
-              ),
-              background: Stack(
-                alignment: Alignment.bottomCenter,
-                children: [
-                  Container(
-                    decoration: new BoxDecoration(
-                      image: new DecorationImage(
-                        image: new AssetImage(
-                            'assets/images/ingredientesPortada.jpg'),
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-        SliverToBoxAdapter(
-          child: Divider(color: Colors.transparent, height: 35),
-        ),
-        SliverGrid(
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisSpacing: 0, mainAxisSpacing: 45, crossAxisCount: 3),
-          delegate: SliverChildListDelegate(
-            getContenedores(listaIngredientes),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-getContenedores(List<Ingrediente> listaIngredientes) {
-  List<Widget> listaContenedores = new List<Widget>();
-
-  for (int i = 0; i < listaIngredientes.length; i++) {
-    listaContenedores.add(ContenedorIngrediente(i, listaIngredientes));
-  }
-
-  return listaContenedores;
 }
 
 class ListaContenedoresIngredientes extends StatelessWidget {
@@ -207,52 +120,6 @@ Color getColor(int index) {
     }
   }
   return color;
-}
-
-class SearchBar extends StatelessWidget {
-  const SearchBar({Key key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 100,
-      alignment: Alignment.topCenter,
-      padding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          AnimatedContainer(
-            alignment: Alignment.topLeft,
-            duration: Duration(milliseconds: 350),
-            curve: Curves.ease,
-            width: MediaQuery.of(context).size.width - 15,
-            height: 45,
-            padding: EdgeInsets.symmetric(horizontal: 15, vertical: 3),
-            decoration: BoxDecoration(
-              color: Color(0xFFF0F4F7),
-              borderRadius: BorderRadius.circular(15),
-            ),
-            child: TextField(
-              cursorColor: Theme.of(context).iconTheme.color,
-              decoration: InputDecoration(
-                hintStyle: Theme.of(context)
-                    .textTheme
-                    .headline1
-                    .copyWith(fontWeight: FontWeight.w500),
-                icon: Icon(Icons.search),
-                hintText: "Buscar recetas",
-                border: InputBorder.none,
-              ),
-              style: Theme.of(context)
-                  .textTheme
-                  .headline1
-                  .copyWith(fontWeight: FontWeight.w600),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }
 
 class ContenedorIngrediente extends StatelessWidget {
