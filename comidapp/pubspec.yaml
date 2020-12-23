@@ -41,6 +41,7 @@ dependencies:
   octo_image: ^0.3.0
   cached_network_image: ^2.4.1
   bordered_text: ^1.0.1
+  material_floating_search_bar: ^0.2.4
 
 
 dev_dependencies:

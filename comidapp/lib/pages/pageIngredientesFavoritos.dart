@@ -75,6 +75,7 @@ class ListaContenedoresIngredientes extends StatelessWidget {
   Widget build(BuildContext context) {
     return AnimationLimiter(
       child: GridView.builder(
+          padding: EdgeInsets.only(top: 25),
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               mainAxisSpacing: 30, crossAxisCount: 3),
           physics:

@@ -308,8 +308,8 @@ class ContenedorComida extends StatelessWidget {
                             size: 21,
                           )
                         : Icon(
-                            MdiIcons.clockTimeFourOutline,
-                            color: Colors.black45,
+                            MdiIcons.clockTimeFour,
+                            color: Color(0xFFB9B9B9),
                             size: 21,
                           );
                   },
@@ -335,8 +335,8 @@ class ContenedorComida extends StatelessWidget {
                             size: 21,
                           )
                         : Icon(
-                            MdiIcons.heartOutline,
-                            color: Colors.black45,
+                            MdiIcons.heart,
+                            color: Color(0xFFB9B9B9),
                             size: 21,
                           );
                   },
@@ -346,13 +346,11 @@ class ContenedorComida extends StatelessWidget {
                           .setComidaFavorita(listaComidas[index].idComida, 1);
 
                       listaComidas[index].favoritoComida = 1;
-                      print("ISERTANDO ELEMENTO");
                       return !favoritoSeleccionado;
                     } else {
                       await DatabaseProvider.db
                           .setComidaFavorita(listaComidas[index].idComida, 0);
                       listaComidas[index].favoritoComida = 0;
-                      print("ELIMINANDO ELEMENTO");
                       return !favoritoSeleccionado;
                     }
                   },

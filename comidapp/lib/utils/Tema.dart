@@ -13,8 +13,14 @@ ThemeData temaPrincipal() {
         headline2: base.headline1.copyWith(
           fontFamily: GoogleFonts.baiJamjuree().fontFamily,
           fontSize: 16.0,
-          color: Colors.black,
+          color: Color(0xFF515151),
           fontWeight: FontWeight.bold,
+        ),
+        headline3: base.headline1.copyWith(
+          fontFamily: GoogleFonts.baiJamjuree().fontFamily,
+          fontSize: 20.0,
+          color: Color(0xFF515151),
+          fontWeight: FontWeight.w900,
         ),
         subtitle1: base.headline1.copyWith(
           fontFamily: GoogleFonts.baiJamjuree().fontFamily,
@@ -25,6 +31,12 @@ ThemeData temaPrincipal() {
           fontFamily: GoogleFonts.baiJamjuree().fontFamily,
           fontSize: 12.0,
           color: Colors.grey,
+        ),
+        headline6: base.headline1.copyWith(
+          fontFamily: GoogleFonts.baiJamjuree().fontFamily,
+          fontSize: 12.0,
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
         ),
         bodyText2: base.bodyText2.copyWith(color: Colors.black),
         bodyText1: base.bodyText2.copyWith(color: Color(0xff21649B)));
