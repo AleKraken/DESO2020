@@ -53,6 +53,7 @@ ThemeData temaPrincipal() {
       color: Color(0xFFFE7A66),
       size: 21,
     ),
+    buttonColor: Color(0xFF45AAB4),
     shadowColor: Colors.grey,
     cardColor: Color(0xFFFFFFFF),
     indicatorColor: Colors.blue,

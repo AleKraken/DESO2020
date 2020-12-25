@@ -1,8 +1,12 @@
 import 'package:comidapp/DB/dataBaseProvider.dart';
+import 'package:comidapp/Notifiers/comidaNotifier.dart';
 import 'package:comidapp/models/comida.dart';
+import 'package:comidapp/models/comidaDelDia.dart';
+import 'package:comidapp/pages/opcionesComida.dart';
 import 'package:comidapp/pages/pageVistaReceta.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:like_button/like_button.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
@@ -147,43 +151,13 @@ getContenedores(List<Comida> listaComidas) {
   return listaContenedores;
 }
 
-/*
-class ListaContenedoresComidas extends StatelessWidget {
-  final List<Comida> listaComidas;
-
-  ListaContenedoresComidas(this.listaComidas);
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimationLimiter(
-      child: ListView.builder(
-          physics:
-              BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
-          itemCount: listaComidas.length,
-          itemBuilder: (BuildContext ctxt, int index) {
-            return AnimationConfiguration.staggeredList(
-              position: index,
-              duration: const Duration(milliseconds: 450),
-              delay: const Duration(milliseconds: 120),
-              child: SlideAnimation(
-                verticalOffset: 60.0,
-                child: FadeInAnimation(
-                  child: ContenedorComida(index, listaComidas),
-                ),
-              ),
-            );
-          }),
-    );
-  }
-}
-
-*/
-
 class ContenedorComida extends StatelessWidget {
   final int index;
   final List<Comida> listaComidas;
 
   ContenedorComida(this.index, this.listaComidas);
+
+  ComidaNotifier comidaNotifier = new ComidaNotifier();
 
   @override
   Widget build(BuildContext context) {
@@ -293,25 +267,18 @@ class ContenedorComida extends StatelessWidget {
               Padding(
                 padding: EdgeInsets.only(right: 7),
                 child: LikeButton(
+                  animationDuration: Duration(seconds: 0),
                   size: 28,
-                  circleColor: CircleColor(
-                      start: Color(0xFFFBB45C), end: Color(0xFFFBB45C)),
-                  bubblesColor: BubblesColor(
-                    dotPrimaryColor: Color(0xFFFBB45C),
-                    dotSecondaryColor: Color(0xFFF9637C),
-                  ),
                   likeBuilder: (bool isLiked) {
-                    return isLiked
-                        ? Icon(
-                            MdiIcons.clockCheck,
-                            color: Theme.of(context).iconTheme.color,
-                            size: 21,
-                          )
-                        : Icon(
-                            MdiIcons.clockTimeFour,
-                            color: Color(0xFFB9B9B9),
-                            size: 21,
-                          );
+                    return Icon(
+                      MdiIcons.plus,
+                      color: Color(0xFF038DB2),
+                      size: 21,
+                    );
+                  },
+                  onTap: (agregarSeleccionado) async {
+                    mostrarOpcionesHorario(context, index);
+                    return !agregarSeleccionado;
                   },
                 ),
               ),
@@ -361,5 +328,35 @@ class ContenedorComida extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  ComidaNotifier getComidaNotifierObject() {
+    return comidaNotifier;
+  }
+
+  mostrarOpcionesHorario(context, int indexComida) {
+    return showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setLocalState) {
+            return OpcionesComida(
+                context, listaComidas[index], index, comidaNotifier);
+          },
+        );
+      },
+    ).whenComplete(() {
+      if (comidaNotifier.comidaGuardada) {
+        Scaffold.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Comida agregada a horario'),
+            duration: Duration(seconds: 3),
+          ),
+        );
+        comidaNotifier.setComidaGuardada(false);
+      }
+    });
   }
 }

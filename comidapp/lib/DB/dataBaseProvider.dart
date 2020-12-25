@@ -2,8 +2,10 @@ import 'dart:math';
 
 import 'package:comidapp/json/JsonGetter.dart';
 import 'package:comidapp/models/comida.dart';
+import 'package:comidapp/models/comidaDelDia.dart';
 import 'package:comidapp/models/comidaHasIngrediente.dart';
 import 'package:comidapp/json/ingredientFromJson.dart';
+import 'package:comidapp/models/horarioComidas.dart';
 import 'package:comidapp/models/ingrediente.dart';
 import 'package:comidapp/json/mealsFromJson.dart';
 import 'package:path/path.dart';
@@ -36,6 +38,19 @@ class DatabaseProvider {
   static const String COLUMN_FOREIGN_COMIDA = "comida_idComida";
   static const String COLUMN_FOREIGN_INGREDIENTE = "ingrediente_idIngrediente";
   static const String COLUMN_MEDIDAINGREDIENTE = "medidaIngrediente";
+
+  //CONSTANTES PARA LA TABLA 'HORARIO COMIDAS'
+  static const String TABLE_HORARIO_COMIDAS = "HorarioComidas";
+  static const String COLUMN_IDCOMIDAHORARIO = "idComidaHorario";
+  static const String COLUMN_DIASEMANA = "diaSemana";
+  static const String COLUMN_FOREIGN_COMIDA_DEL_DIA =
+      "comidaDelDia_idComidaDelDia";
+
+  //CONSTANTES PARA LA TABLA 'COMIDA DEL DIA'
+  static const String TABLE_COMIDA_DEL_DIA = 'ComidaDelDia';
+  static const String COLUMN_IDCOMIDADELDIA = 'idComidaDelDia';
+  static const String COLUMN_HORA = 'hora';
+  static const String COLUMN_NOMBRECOMIDADELDIA = 'nombreComidaDelDia';
 
   DatabaseProvider._();
   static final DatabaseProvider db = DatabaseProvider._();
@@ -94,11 +109,48 @@ class DatabaseProvider {
         print("CREANDO TABLA COMIDAS-INGREDIENTES");
         await database.execute(
           "CREATE TABLE IF NOT EXISTS $TABLE_COMIDA_HAS_INGREDIENTE ("
-          "$COLUMN_FOREIGN_COMIDA INTEGER,"
+          "$COLUMN_FOREIGN_COMIDA INTEGER NOT NULL,"
           "$COLUMN_FOREIGN_INGREDIENTE INTEGER,"
           "$COLUMN_MEDIDAINGREDIENTE"
           ");",
         );
+
+        //TABLA HORARIO COMIDAS
+        print("CREANDO TABLA HORARIO COMIDAS");
+        await database.execute(
+          "CREATE TABLE IF NOT EXISTS $TABLE_HORARIO_COMIDAS ("
+          "$COLUMN_IDCOMIDAHORARIO INTEGER NOT NULL,"
+          "$COLUMN_FOREIGN_COMIDA INTEGER NOT NULL,"
+          "$COLUMN_DIASEMANA INTEGER NOT NULL,"
+          "$COLUMN_FOREIGN_COMIDA_DEL_DIA INTEGER NOT NULL,"
+          "PRIMARY KEY ($COLUMN_IDCOMIDAHORARIO AUTOINCREMENT)"
+          ");",
+        );
+
+        //TABLA COMIDA DEL DIA
+        print("CREANDO TABLA COMIDA DEL DIA");
+        await database.execute(
+          "CREATE TABLE IF NOT EXISTS $TABLE_COMIDA_DEL_DIA ("
+          "$COLUMN_IDCOMIDADELDIA INTEGER NOT NULL,"
+          "$COLUMN_HORA INTEGER,"
+          "$COLUMN_NOMBRECOMIDADELDIA TEXT NOT NULL,"
+          "PRIMARY KEY ($COLUMN_IDCOMIDADELDIA AUTOINCREMENT)"
+          ");",
+        );
+
+        //INSERTAR INFORMACION EN COMIDA DEL DIA
+        await database.execute("INSERT INTO $TABLE_COMIDA_DEL_DIA "
+            "($COLUMN_HORA, $COLUMN_NOMBRECOMIDADELDIA)"
+            " values ('9:00 am', 'Desayuno');");
+        await database.execute("INSERT INTO $TABLE_COMIDA_DEL_DIA "
+            "($COLUMN_HORA, $COLUMN_NOMBRECOMIDADELDIA)"
+            " values ('11:00 am', 'Almuerzo');");
+        await database.execute("INSERT INTO $TABLE_COMIDA_DEL_DIA "
+            "($COLUMN_HORA, $COLUMN_NOMBRECOMIDADELDIA)"
+            " values ('3:30 pm', 'Comida');");
+        await database.execute("INSERT INTO $TABLE_COMIDA_DEL_DIA "
+            "($COLUMN_HORA, $COLUMN_NOMBRECOMIDADELDIA)"
+            " values ('8:30 pm', 'Cena');");
 
         //INSERTAR INFORMACION DE COMIDAS
         Meal listaComidas = await JsonGetter.getComidas();
@@ -316,6 +368,119 @@ class DatabaseProvider {
     final db = await database;
     return await db.rawUpdate(
         "UPDATE $TABLE_INGREDIENTE SET $COLUMN_FAVORITOINGREDIENTE = $ponerFavorito WHERE $COLUMN_IDINGREDIENTE =$idIngrediente");
+  }
+
+  Future insertComidaDeHorario(
+      int idComida, int diaSemana, int idComidaDelDia) async {
+    final db = await database;
+
+    await db.rawInsert("INSERT INTO $TABLE_HORARIO_COMIDAS "
+        "($COLUMN_FOREIGN_COMIDA, $COLUMN_DIASEMANA, $COLUMN_FOREIGN_COMIDA_DEL_DIA)"
+        " values ($idComida, $diaSemana, $idComidaDelDia);");
+  }
+
+  Future deleteComidaDelHorario(int index) async {
+    final db = await database;
+
+    await db.rawDelete(
+        "DELETE FROM $TABLE_HORARIO_COMIDAS WHERE $COLUMN_IDCOMIDAHORARIO = $index");
+  }
+
+  Future<List<Comida>> getComidasDeHorario(int indexDia) async {
+    final db = await database;
+
+    var comidas = await db.rawQuery("SELECT "
+        "a.$COLUMN_IDCOMIDA,"
+        "a.$COLUMN_NOMBRECOMIDA,"
+        "a.$COLUMN_CATEGORIACOMIDA,"
+        "a.$COLUMN_AREA,"
+        "a.$COLUMN_MINUTOSPREPARACION,"
+        "a.$COLUMN_PASOSPREPARACION,"
+        "a.$COLUMN_CALORIAS,"
+        "a.$COLUMN_RUTAIMAGEN,"
+        "a.$COLUMN_FAVORITOCOMIDA "
+        "FROM $TABLE_COMIDA a, $TABLE_HORARIO_COMIDAS b "
+        "WHERE a.$COLUMN_IDCOMIDA = b.$COLUMN_FOREIGN_COMIDA "
+        "AND b.$COLUMN_DIASEMANA = $indexDia");
+
+    List<Comida> listaComidas = List<Comida>();
+    comidas.forEach((comidaActual) async {
+      Comida comida = Comida.fromMap(comidaActual);
+
+      listaComidas.add(comida);
+      await Future.delayed(Duration.zero);
+    });
+
+    for (int i = 0; i < listaComidas.length; i++) {
+      listaComidas[i].listaIngredientesEnComida = new List<int>();
+      listaComidas[i].listaMedidasIngredientes = new List<String>();
+
+      List<Map<String, dynamic>> ingredientesEnComida = await db.rawQuery(
+          "SELECT $COLUMN_FOREIGN_INGREDIENTE, $COLUMN_MEDIDAINGREDIENTE "
+          "FROM $TABLE_COMIDA_HAS_INGREDIENTE "
+          "WHERE $COLUMN_FOREIGN_COMIDA = ${listaComidas[i].idComida}");
+
+      ingredientesEnComida.forEach((ingredienteActual) async {
+        ComidaHasIngrediente ingrediente =
+            ComidaHasIngrediente.fromMap(ingredienteActual);
+
+        if (ingrediente.foreignIdIngrediente != null) {
+          listaComidas[i]
+              .listaIngredientesEnComida
+              .add(ingrediente.foreignIdIngrediente);
+
+          listaComidas[i]
+              .listaMedidasIngredientes
+              .add(ingrediente.medidaIngrediente);
+        }
+
+        await Future.delayed(Duration.zero);
+      });
+    }
+    print(listaComidas.length);
+    return listaComidas;
+  }
+
+  Future<List<ComidaDelDia>> getComidasDelDia() async {
+    final db = await database;
+
+    var comidasDelDia = await db.rawQuery("SELECT "
+        "$COLUMN_IDCOMIDADELDIA,"
+        "$COLUMN_HORA,"
+        "$COLUMN_NOMBRECOMIDADELDIA "
+        "FROM $TABLE_COMIDA_DEL_DIA ");
+
+    List<ComidaDelDia> listaComidasDelDia = List<ComidaDelDia>();
+    comidasDelDia.forEach((comidaActual) async {
+      ComidaDelDia comida = ComidaDelDia.fromMap(comidaActual);
+
+      listaComidasDelDia.add(comida);
+      await Future.delayed(Duration.zero);
+    });
+
+    return listaComidasDelDia;
+  }
+
+  Future<List<HorarioComida>> getHorario(int indexDia) async {
+    final db = await database;
+
+    var comidasEnHorario = await db.rawQuery("SELECT "
+        "$COLUMN_IDCOMIDAHORARIO,"
+        "$COLUMN_FOREIGN_COMIDA,"
+        "$COLUMN_DIASEMANA,"
+        "$COLUMN_FOREIGN_COMIDA_DEL_DIA "
+        "FROM $TABLE_HORARIO_COMIDAS "
+        "WHERE $COLUMN_DIASEMANA = $indexDia");
+
+    List<HorarioComida> listaComidasEnHorario = List<HorarioComida>();
+    comidasEnHorario.forEach((comidaActual) async {
+      HorarioComida comidaEnHorario = HorarioComida.fromMap(comidaActual);
+
+      listaComidasEnHorario.add(comidaEnHorario);
+      await Future.delayed(Duration.zero);
+    });
+
+    return listaComidasEnHorario;
   }
 
   Future<List<Comida>> getComidas() async {

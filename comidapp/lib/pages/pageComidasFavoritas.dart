@@ -1,5 +1,7 @@
 import 'package:comidapp/DB/dataBaseProvider.dart';
+import 'package:comidapp/Notifiers/comidaNotifier.dart';
 import 'package:comidapp/models/comida.dart';
+import 'package:comidapp/pages/opcionesComida.dart';
 import 'package:comidapp/pages/pageVistaReceta.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -97,11 +99,24 @@ class ListaContenedoresComidas extends StatelessWidget {
   }
 }
 
-class ContenedorComida extends StatelessWidget {
+class ContenedorComida extends StatefulWidget {
   final int index;
   final List<Comida> listaComidas;
 
   ContenedorComida(this.index, this.listaComidas);
+
+  @override
+  _ContenedorComidaState createState() =>
+      _ContenedorComidaState(index, listaComidas);
+}
+
+class _ContenedorComidaState extends State<ContenedorComida> {
+  final int index;
+  final List<Comida> listaComidas;
+
+  _ContenedorComidaState(this.index, this.listaComidas);
+
+  ComidaNotifier comidaNotifier = new ComidaNotifier();
 
   @override
   Widget build(BuildContext context) {
@@ -126,12 +141,16 @@ class ContenedorComida extends StatelessWidget {
             child: FlatButton(
               padding: EdgeInsets.all(0),
               onPressed: () {
-                Navigator.of(context).push(
+                Navigator.of(context)
+                    .push(
                   MaterialPageRoute(
                     builder: (context) =>
                         DetallesComida(listaComidas[index], index),
                   ),
-                );
+                )
+                    .then((value) {
+                  setState(() {});
+                });
               },
               child: Row(
                 children: [
@@ -211,25 +230,18 @@ class ContenedorComida extends StatelessWidget {
               Padding(
                 padding: EdgeInsets.only(right: 7),
                 child: LikeButton(
+                  animationDuration: Duration(seconds: 0),
                   size: 28,
-                  circleColor: CircleColor(
-                      start: Color(0xFFFBB45C), end: Color(0xFFFBB45C)),
-                  bubblesColor: BubblesColor(
-                    dotPrimaryColor: Color(0xFFFBB45C),
-                    dotSecondaryColor: Color(0xFFF9637C),
-                  ),
                   likeBuilder: (bool isLiked) {
-                    return isLiked
-                        ? Icon(
-                            MdiIcons.clockCheck,
-                            color: Theme.of(context).iconTheme.color,
-                            size: 21,
-                          )
-                        : Icon(
-                            MdiIcons.clockTimeFour,
-                            color: Color(0xFFB9B9B9),
-                            size: 21,
-                          );
+                    return Icon(
+                      MdiIcons.plus,
+                      color: Color(0xFF038DB2),
+                      size: 21,
+                    );
+                  },
+                  onTap: (agregarSeleccionado) async {
+                    mostrarOpcionesHorario(context, index);
+                    return !agregarSeleccionado;
                   },
                 ),
               ),
@@ -279,5 +291,35 @@ class ContenedorComida extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  ComidaNotifier getComidaNotifierObject() {
+    return comidaNotifier;
+  }
+
+  mostrarOpcionesHorario(context, int indexComida) {
+    return showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setLocalState) {
+            return OpcionesComida(
+                context, listaComidas[index], index, comidaNotifier);
+          },
+        );
+      },
+    ).whenComplete(() {
+      if (comidaNotifier.comidaGuardada) {
+        Scaffold.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Comida agregada a horario'),
+            duration: Duration(seconds: 3),
+          ),
+        );
+        comidaNotifier.setComidaGuardada(false);
+      }
+    });
   }
 }

@@ -1,7 +1,9 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:comidapp/DB/dataBaseProvider.dart';
+import 'package:comidapp/Notifiers/comidaNotifier.dart';
 import 'package:comidapp/models/comida.dart';
 import 'package:comidapp/models/ingrediente.dart';
+import 'package:comidapp/pages/opcionesComida.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:like_button/like_button.dart';
@@ -99,7 +101,7 @@ class _DetallesComidaState extends State<DetallesComida> {
             ),
           ),
           SliverToBoxAdapter(
-            child: SliverTitulo(comida),
+            child: SliverTitulo(comida, index),
           ),
           SliverToBoxAdapter(
             child: SliverSubtitulo(comida),
@@ -447,8 +449,11 @@ class SliverSubtitulo extends StatelessWidget {
 
 class SliverTitulo extends StatelessWidget {
   final Comida comida;
+  final int index;
 
-  const SliverTitulo(this.comida);
+  SliverTitulo(this.comida, this.index);
+
+  ComidaNotifier comidaNotifier = new ComidaNotifier();
 
   @override
   Widget build(BuildContext context) {
@@ -508,41 +513,18 @@ class SliverTitulo extends StatelessWidget {
             ),
             Padding(padding: EdgeInsets.only(right: 10)),
             LikeButton(
-              likeCountPadding: EdgeInsets.all(0),
-              isLiked: comida.favoritoComida == 1 ? true : false,
-              size: 38,
-              circleColor:
-                  CircleColor(start: Color(0xFFFBB45C), end: Color(0xFFFBB45C)),
-              bubblesColor: BubblesColor(
-                dotPrimaryColor: Color(0xFFFBB45C),
-                dotSecondaryColor: Color(0xFFF9637C),
-              ),
+              animationDuration: Duration(seconds: 0),
+              size: 28,
               likeBuilder: (bool isLiked) {
-                return isLiked
-                    ? Icon(
-                        MdiIcons.clockCheck,
-                        color: Color(0xFFF9637C),
-                        size: 25,
-                      )
-                    : Icon(
-                        MdiIcons.clockTimeFour,
-                        color: Color(0xFFB9B9B9),
-                        size: 25,
-                      );
+                return Icon(
+                  MdiIcons.plus,
+                  color: Color(0xFF038DB2),
+                  size: 21,
+                );
               },
-              onTap: (favoritoSeleccionado) async {
-                if (comida.favoritoComida == 0) {
-                  await DatabaseProvider.db
-                      .setComidaFavorita(comida.idComida, 1);
-
-                  comida.favoritoComida = 1;
-                  return !favoritoSeleccionado;
-                } else {
-                  await DatabaseProvider.db
-                      .setComidaFavorita(comida.idComida, 0);
-                  comida.favoritoComida = 0;
-                  return !favoritoSeleccionado;
-                }
+              onTap: (agregarSeleccionado) async {
+                mostrarOpcionesHorario(context, index);
+                return !agregarSeleccionado;
               },
             ),
             Padding(padding: EdgeInsets.only(right: 10)),
@@ -550,5 +532,34 @@ class SliverTitulo extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  ComidaNotifier getComidaNotifierObject() {
+    return comidaNotifier;
+  }
+
+  mostrarOpcionesHorario(context, int indexComida) {
+    return showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setLocalState) {
+            return OpcionesComida(context, comida, index, comidaNotifier);
+          },
+        );
+      },
+    ).whenComplete(() {
+      if (comidaNotifier.comidaGuardada) {
+        Scaffold.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Comida agregada a horario'),
+            duration: Duration(seconds: 3),
+          ),
+        );
+        comidaNotifier.setComidaGuardada(false);
+      }
+    });
   }
 }
