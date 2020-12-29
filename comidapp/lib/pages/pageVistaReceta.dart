@@ -12,18 +12,21 @@ import 'package:material_design_icons_flutter/material_design_icons_flutter.dart
 class DetallesComida extends StatefulWidget {
   final Comida comida;
   final int index;
+  final String rutaHero;
 
-  DetallesComida(this.comida, this.index);
+  DetallesComida(this.comida, this.index, this.rutaHero);
 
   @override
-  _DetallesComidaState createState() => _DetallesComidaState(comida, index);
+  _DetallesComidaState createState() =>
+      _DetallesComidaState(comida, index, rutaHero);
 }
 
 class _DetallesComidaState extends State<DetallesComida> {
   final Comida comida;
   final int index;
+  final String rutaHero;
 
-  _DetallesComidaState(this.comida, this.index);
+  _DetallesComidaState(this.comida, this.index, this.rutaHero);
 
   @override
   Widget build(BuildContext context) {
@@ -69,9 +72,15 @@ class _DetallesComidaState extends State<DetallesComida> {
                         background: Container(
                           height: 180,
                           child: Hero(
-                            tag: 'heroImagen$index',
-                            child: Image.network(comida.rutaImagen,
-                                fit: BoxFit.cover),
+                            tag: '$rutaHero',
+                            child: FadeInImage(
+                              placeholder: AssetImage(
+                                  'assets/images/comidaCargando.jpg'),
+                              image: NetworkImage(
+                                '${comida.rutaImagen}',
+                              ),
+                              fit: BoxFit.cover,
+                            ),
                           ),
                         ),
                       ),
@@ -123,7 +132,9 @@ class _DetallesComidaState extends State<DetallesComida> {
 
 class SliverInstrucciones extends StatelessWidget {
   final Comida comida;
-  const SliverInstrucciones(this.comida);
+  SliverInstrucciones(this.comida);
+
+  String traduccion;
 
   @override
   Widget build(BuildContext context) {
@@ -154,11 +165,13 @@ class SliverIngredientes extends StatefulWidget {
 }
 
 class _SliverIngredientesState extends State<SliverIngredientes> {
-  final Comida comida;
+  Comida comida;
   _SliverIngredientesState(this.comida);
 
   List<Ingrediente> listaIngredientes = new List<Ingrediente>();
   Future _futureIngredientes;
+  List<String> advertenciasIngredientes = new List<String>();
+  List<String> favoritosIngredientes = new List<String>();
 
   void initState() {
     super.initState();
@@ -166,11 +179,18 @@ class _SliverIngredientesState extends State<SliverIngredientes> {
   }
 
   Future getIngredientes() async {
+    comida = await DatabaseProvider.db.getComidaConIngredientes(comida);
+
     for (int i = 0; i < comida.listaIngredientesEnComida.length; i++) {
       listaIngredientes.add(await DatabaseProvider.db
           .getIngredienteIndividual(comida.listaIngredientesEnComida[i]));
+      if (listaIngredientes.last.disgustaIngrediente == 1) {
+        advertenciasIngredientes.add(listaIngredientes.last.nombreIngrediente);
+      }
+      if (listaIngredientes.last.favoritoIngrediente == 1) {
+        favoritosIngredientes.add(listaIngredientes.last.nombreIngrediente);
+      }
     }
-
     return Future.delayed(Duration.zero);
   }
 
@@ -197,13 +217,100 @@ class _SliverIngredientesState extends State<SliverIngredientes> {
                 delay: Duration(milliseconds: 300),
                 duration: Duration(milliseconds: 600),
                 child: Padding(
-                  padding: EdgeInsets.only(top: 10),
+                  padding: EdgeInsets.only(top: 2),
                   child: Container(
                     padding: EdgeInsets.symmetric(horizontal: 25),
                     child: Column(
                       children: [
+                        favoritosIngredientes.length > 0
+                            ? Container(
+                                width: MediaQuery.of(context).size.width,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: Color(0xFF038DB2),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        blurRadius: 11,
+                                        color: Theme.of(context).shadowColor,
+                                        offset: const Offset(0, 5),
+                                        spreadRadius: -2,
+                                      ),
+                                    ],
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Container(
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 6, vertical: 7),
+                                    child: Row(
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                              "Esta receta contiene ${getNombresFavoritos()}",
+                                              textAlign: TextAlign.start,
+                                              textScaleFactor: .9,
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .headline2
+                                                  .copyWith(
+                                                      color: Colors.white)),
+                                        ),
+                                        Container(width: 10),
+                                        Icon(
+                                          MdiIcons.heart,
+                                        ),
+                                        Container(width: 5),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              )
+                            : Container(),
+                        Divider(color: Colors.transparent),
+                        advertenciasIngredientes.length > 0
+                            ? Container(
+                                width: MediaQuery.of(context).size.width,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: Color(0xFFC63637),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        blurRadius: 11,
+                                        color: Theme.of(context).shadowColor,
+                                        offset: const Offset(0, 5),
+                                        spreadRadius: -2,
+                                      ),
+                                    ],
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Container(
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 6, vertical: 7),
+                                    child: Row(
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                              "Esta receta contiene ${getNombresAdvertencias()}",
+                                              textAlign: TextAlign.start,
+                                              textScaleFactor: .9,
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .headline2
+                                                  .copyWith(
+                                                      color: Colors.white)),
+                                        ),
+                                        Container(width: 10),
+                                        Icon(
+                                          MdiIcons.thumbDown,
+                                        ),
+                                        Container(width: 5),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              )
+                            : Container(),
                         Container(
-                          margin: EdgeInsets.symmetric(vertical: 10),
+                          margin: EdgeInsets.only(top: 35, bottom: 5),
                           width: MediaQuery.of(context).size.width,
                           child: Text(
                               "${comida.listaIngredientesEnComida.length} Ingredientes",
@@ -226,11 +333,67 @@ class _SliverIngredientesState extends State<SliverIngredientes> {
     );
   }
 
+  String getNombresFavoritos() {
+    favoritosIngredientes = favoritosIngredientes.toSet().toList();
+
+    String favoritos = "";
+
+    if (favoritosIngredientes.length == 1) {
+      return "${favoritosIngredientes[0]}.";
+    } else if (favoritosIngredientes.length == 2) {
+      return favoritos +=
+          "${favoritosIngredientes[0]} y ${favoritosIngredientes[1]}.";
+    } else {
+      for (int i = 0; i < favoritosIngredientes.length; i++) {
+        if (i == 0 && favoritosIngredientes.length > 2) {
+          favoritos += "${favoritosIngredientes[i]}";
+        } else {
+          if (i == favoritosIngredientes.length - 2) {
+            favoritos +=
+                ", ${favoritosIngredientes[i]} y ${favoritosIngredientes[i + 1]}.";
+            return favoritos;
+          } else {
+            favoritos += ", ${favoritosIngredientes[i]}";
+          }
+        }
+      }
+    }
+    return favoritos;
+  }
+
+  String getNombresAdvertencias() {
+    advertenciasIngredientes = advertenciasIngredientes.toSet().toList();
+
+    String advertencia = "";
+
+    if (advertenciasIngredientes.length == 1) {
+      return "${advertenciasIngredientes[0]}.";
+    } else if (advertenciasIngredientes.length == 2) {
+      return advertencia +=
+          "${advertenciasIngredientes[0]} y ${advertenciasIngredientes[1]}.";
+    } else {
+      for (int i = 0; i < advertenciasIngredientes.length; i++) {
+        if (i == 0 && advertenciasIngredientes.length > 2) {
+          advertencia += "${advertenciasIngredientes[i]}";
+        } else {
+          if (i == advertenciasIngredientes.length - 2) {
+            advertencia +=
+                ", ${advertenciasIngredientes[i]} y ${advertenciasIngredientes[i + 1]}.";
+            return advertencia;
+          } else {
+            advertencia += ", ${advertenciasIngredientes[i]}";
+          }
+        }
+      }
+    }
+    return advertencia;
+  }
+
   List<Widget> columnaIngredientes() {
     List<Widget> listaFilas = new List<Widget>();
 
     for (int i = 0; i < comida.listaIngredientesEnComida.length; i++) {
-      listaFilas.add(Divider());
+      listaFilas.add(Divider(color: Colors.transparent, height: 12));
       listaFilas.add(
         filaIngrediente(i),
       );
@@ -239,75 +402,101 @@ class _SliverIngredientesState extends State<SliverIngredientes> {
   }
 
   Widget filaIngrediente(int index) {
-    return SlideInLeft(
+    return SlideInUp(
       delay: Duration(milliseconds: 100 + (index * 100)),
       from: 50,
       child: FadeIn(
         delay: Duration(milliseconds: 100 + (index * 100)),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 70,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Container(
-                    height: 30,
-                    width: 30,
-                    decoration: BoxDecoration(
-                      boxShadow: [
-                        BoxShadow(
-                          blurRadius: 20,
-                          color: Colors.black,
-                          offset: const Offset(0, 22),
-                          spreadRadius: -14,
-                        ),
-                      ],
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: FadeInImage(
-                        imageErrorBuilder: (BuildContext context,
-                            Object exception, StackTrace stackTrace) {
-                          print('Error Handler');
-                          return Container(
-                            width: 100.0,
-                            height: 100.0,
-                            child: Image.asset(
-                                'assets/images/ingredienteCargando.png'),
-                          );
-                        },
-                        placeholder:
-                            AssetImage('assets/images/ingredienteCargando.png'),
-                        image: index > 534
-                            ? AssetImage(
-                                'assets/images/ingredienteCargando.png')
-                            : NetworkImage(
-                                '${listaIngredientes[index].rutaImagenIngrediente}'),
-                        fit: BoxFit.cover,
-                        height: 100.0,
-                        width: 100.0,
-                      ),
-                    ),
-                  ),
-                  Divider(color: Colors.transparent, height: 6),
-                  Text("${listaIngredientes[index].nombreIngrediente}",
-                      textAlign: TextAlign.end,
-                      style: Theme.of(context)
-                          .textTheme
-                          .headline2
-                          .copyWith(fontSize: 12)),
-                ],
+        child: Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).cardColor,
+            boxShadow: [
+              BoxShadow(
+                blurRadius: 6,
+                color: Theme.of(context).shadowColor,
+                offset: const Offset(0, 5),
+                spreadRadius: -2,
               ),
-            ),
-            Padding(padding: EdgeInsets.symmetric(horizontal: 10)),
-            Expanded(
-              child: Text("${comida.listaMedidasIngredientes[index]}",
-                  textAlign: TextAlign.start,
-                  style: Theme.of(context).textTheme.subtitle2),
-            ),
-          ],
+            ],
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Expanded(
+                child: Container(
+                  padding: EdgeInsets.all(3),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          "${listaIngredientes[index].nombreIngrediente}",
+                          textAlign: TextAlign.end,
+                          style: Theme.of(context)
+                              .textTheme
+                              .headline2
+                              .copyWith(fontSize: 12),
+                        ),
+                      ),
+                      Container(width: 10),
+                      Container(
+                        height: 30,
+                        width: 30,
+                        decoration: BoxDecoration(
+                          boxShadow: [
+                            BoxShadow(
+                              blurRadius: 20,
+                              color: Colors.black,
+                              offset: const Offset(0, 22),
+                              spreadRadius: -14,
+                            ),
+                          ],
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: FadeInImage(
+                            imageErrorBuilder: (BuildContext context,
+                                Object exception, StackTrace stackTrace) {
+                              return Container(
+                                width: 30.0,
+                                height: 30.0,
+                                child: Image.asset(
+                                    'assets/images/ingredienteCargando.png'),
+                              );
+                            },
+                            placeholder: AssetImage(
+                                'assets/images/ingredienteCargando.png'),
+                            image: index > 534
+                                ? AssetImage(
+                                    'assets/images/ingredienteCargando.png')
+                                : NetworkImage(
+                                    '${listaIngredientes[index].rutaImagenIngrediente}'),
+                            fit: BoxFit.cover,
+                            height: 100.0,
+                            width: 100.0,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Container(
+                width: 20,
+                alignment: Alignment.center,
+                child: Text("•",
+                    textAlign: TextAlign.start,
+                    style: Theme.of(context).textTheme.headline2),
+              ),
+              Expanded(
+                child: Text("${comida.listaMedidasIngredientes[index]}",
+                    textAlign: TextAlign.start,
+                    style: Theme.of(context).textTheme.subtitle2),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -350,7 +539,7 @@ class SliverInformacion extends StatelessWidget {
                     padding: EdgeInsets.symmetric(horizontal: 5, vertical: 3),
                     child: Text("Tipo\n${comida.categoria}",
                         textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.headline6),
+                        style: Theme.of(context).textTheme.headline5),
                   ),
                 ),
               ),
@@ -380,7 +569,7 @@ class SliverInformacion extends StatelessWidget {
                     padding: EdgeInsets.symmetric(horizontal: 5, vertical: 3),
                     child: Text("${comida.minutosPreparacion}\nMinutos",
                         textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.headline6),
+                        style: Theme.of(context).textTheme.headline5),
                   ),
                 ),
               ),
@@ -414,7 +603,7 @@ class SliverInformacion extends StatelessWidget {
                     padding: EdgeInsets.symmetric(horizontal: 5, vertical: 3),
                     child: Text("${comida.calorias}\nCalorías",
                         textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.headline6),
+                        style: Theme.of(context).textTheme.headline5),
                   ),
                 ),
               ),
@@ -554,6 +743,8 @@ class SliverTitulo extends StatelessWidget {
       if (comidaNotifier.comidaGuardada) {
         Scaffold.of(context).showSnackBar(
           SnackBar(
+            elevation: 6.0,
+            behavior: SnackBarBehavior.floating,
             content: Text('Comida agregada a horario'),
             duration: Duration(seconds: 3),
           ),

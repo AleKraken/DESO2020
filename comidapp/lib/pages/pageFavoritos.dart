@@ -106,7 +106,9 @@ class _FavoritosState extends State<Favoritos> {
             controller: pageController,
             onPageChanged: (index) {
               _indicePagina = index;
-              setState(() {});
+              if (this.mounted) {
+                setState(() {});
+              }
             },
           ),
         ),

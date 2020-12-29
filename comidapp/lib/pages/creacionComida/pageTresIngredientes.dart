@@ -1,41 +1,19 @@
 import 'package:animate_do/animate_do.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:comidapp/DB/dataBaseProvider.dart';
+import 'package:comidapp/models/comidaCreada.dart';
 import 'package:comidapp/models/ingrediente.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:like_button/like_button.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
-class Ingredientes extends StatefulWidget {
-  Ingredientes({Key key}) : super(key: key);
+class PaginaTresIngredientes extends StatefulWidget {
+  PaginaTresIngredientes({Key key}) : super(key: key);
 
   @override
-  _IngredientesState createState() => _IngredientesState();
+  _PaginaTresIngredientesState createState() => _PaginaTresIngredientesState();
 }
 
-class _IngredientesState extends State<Ingredientes> {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Theme.of(context).backgroundColor,
-      body: Center(
-        child: Container(
-          child: SliverSuperior(),
-        ),
-      ),
-    );
-  }
-}
-
-class SliverSuperior extends StatefulWidget {
-  @override
-  _SliverSuperiorState createState() => _SliverSuperiorState();
-}
-
-class _SliverSuperiorState extends State<SliverSuperior> {
+class _PaginaTresIngredientesState extends State<PaginaTresIngredientes> {
   List<Ingrediente> listaIngredientesBusqueda = new List<Ingrediente>();
 
   Future _futureIngredientes;
@@ -63,59 +41,26 @@ class _SliverSuperiorState extends State<SliverSuperior> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        FocusScope.of(context).requestFocus(new FocusNode());
-      },
-      child: CustomScrollView(
+    return Scaffold(
+      backgroundColor: Theme.of(context).backgroundColor,
+      body: CustomScrollView(
         physics: BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
         slivers: <Widget>[
-          SliverAppBar(
-            pinned: true,
-            expandedHeight: MediaQuery.of(context).size.height / 6,
-            elevation: 20,
-            automaticallyImplyLeading: false,
-            backgroundColor: Theme.of(context).backgroundColor,
-            shadowColor: Colors.black,
-            flexibleSpace: Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.centerLeft,
-                  end: Alignment.centerRight,
-                  colors: [
-                    Color(0xFFFBB45C),
-                    Color(0xFFFE7A66),
-                  ],
-                ),
-              ),
-              child: FlexibleSpaceBar(
-                centerTitle: true,
-                title: Container(
-                  alignment: Alignment.bottomCenter,
-                  child: Text("Ingredientes",
-                      maxLines: 1,
-                      textAlign: TextAlign.center,
-                      overflow: TextOverflow.ellipsis,
-                      style: Theme.of(context)
-                          .textTheme
-                          .headline1
-                          .copyWith(color: Colors.white)),
-                ),
-                background: Stack(
-                  alignment: Alignment.bottomCenter,
-                  children: [
-                    Container(
-                      decoration: new BoxDecoration(
-                        image: new DecorationImage(
-                          image: new AssetImage(
-                              'assets/images/ingredientesPortada.jpg'),
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+          SliverToBoxAdapter(
+            child: Container(
+              margin: EdgeInsets.only(left: 20, right: 20, top: 20),
+              child: Text("Selecciona los ingredientes",
+                  textAlign: TextAlign.start,
+                  style: Theme.of(context).textTheme.headline3),
+            ),
+          ),
+          SliverToBoxAdapter(
+            child: Container(
+              margin: EdgeInsets.only(left: 20, right: 20, top: 0, bottom: 0),
+              child: Text(
+                  "Selecciona entre 1 y 20 ingredientes para tu comida.",
+                  textAlign: TextAlign.start,
+                  style: Theme.of(context).textTheme.subtitle1),
             ),
           ),
           FutureBuilder(
@@ -162,6 +107,11 @@ class _SliverSuperiorState extends State<SliverSuperior> {
                   );
                 }
               }),
+          SliverToBoxAdapter(
+            child: Container(
+              height: 50,
+            ),
+          ),
         ],
       ),
     );
@@ -258,25 +208,24 @@ Color getColor(int index) {
   return color;
 }
 
-class ContenedorIngrediente extends StatefulWidget {
+class ContenedorIngrediente extends StatelessWidget {
   final int index;
   final List<Ingrediente> listaIngredientes;
 
   ContenedorIngrediente(this.index, this.listaIngredientes);
 
-  @override
-  _ContenedorIngredienteState createState() =>
-      _ContenedorIngredienteState(index, listaIngredientes);
-}
+  ComidaCreada comidaCreada = ComidaCreada.getComidaCreada();
 
-class _ContenedorIngredienteState extends State<ContenedorIngrediente> {
-  int index;
-  List<Ingrediente> listaIngredientes;
-
-  _ContenedorIngredienteState(this.index, this.listaIngredientes);
+  bool elementoSeleccionado = false;
 
   @override
   Widget build(BuildContext context) {
+    comidaCreada.getListaIngredientes().forEach((element) {
+      if (listaIngredientes[index].idIngrediente == element.idIngrediente) {
+        elementoSeleccionado = true;
+      }
+    });
+
     return Container(
       decoration: BoxDecoration(
         boxShadow: [
@@ -353,9 +302,7 @@ class _ContenedorIngredienteState extends State<ContenedorIngrediente> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 LikeButton(
-                  isLiked: listaIngredientes[index].disgustaIngrediente == 1
-                      ? true
-                      : false,
+                  isLiked: elementoSeleccionado,
                   size: 28,
                   circleColor: CircleColor(
                       start: Color(0xFFFBB45C), end: Color(0xFFFBB45C)),
@@ -366,78 +313,52 @@ class _ContenedorIngredienteState extends State<ContenedorIngrediente> {
                   likeBuilder: (bool isLiked) {
                     return isLiked
                         ? Icon(
-                            MdiIcons.thumbDown,
+                            MdiIcons.check,
                             color: Theme.of(context).iconTheme.color,
                             size: 21,
                           )
                         : Icon(
-                            MdiIcons.thumbDownOutline,
+                            MdiIcons.plus,
                             color: Colors.white,
                             size: 21,
                           );
                   },
-                  onTap: (disgustaSeleccionado) async {
-                    if (listaIngredientes[index].disgustaIngrediente == 0) {
-                      await DatabaseProvider.db.setDisgustaIngrediente(
-                          listaIngredientes[index].idIngrediente, 1);
-                      await DatabaseProvider.db.setIngredienteFavorito(
-                          listaIngredientes[index].idIngrediente, 0);
+                  onTap: (agregadoSeleccionado) async {
+                    if (!agregadoSeleccionado) {
+                      FocusScope.of(context).requestFocus(new FocusNode());
+                      if (comidaCreada.listaIngredientes.length < 20) {
+                        comidaCreada
+                            .agregarIngrediente(listaIngredientes[index]);
+                        comidaCreada.agregarCantidadIngredienteALista();
 
-                      listaIngredientes[index].favoritoIngrediente = 0;
-                      listaIngredientes[index].disgustaIngrediente = 1;
-
-                      setState(() {});
-
-                      return !disgustaSeleccionado;
+                        Scaffold.of(context).showSnackBar(
+                          SnackBar(
+                            margin: EdgeInsets.symmetric(
+                                vertical: 30, horizontal: 15),
+                            elevation: 6.0,
+                            behavior: SnackBarBehavior.floating,
+                            content: Text(
+                                'Se agregó ${listaIngredientes[index].nombreIngrediente} a la comida'),
+                            duration: Duration(milliseconds: 1500),
+                          ),
+                        );
+                        return !agregadoSeleccionado;
+                      } else {
+                        Scaffold.of(context).showSnackBar(
+                          SnackBar(
+                            elevation: 6.0,
+                            behavior: SnackBarBehavior.floating,
+                            content: Text(
+                                'Has alcanzado el límite de ingredientes por comida (20)'),
+                            duration: Duration(milliseconds: 1500),
+                          ),
+                        );
+                        return agregadoSeleccionado;
+                      }
                     } else {
-                      await DatabaseProvider.db.setDisgustaIngrediente(
-                          listaIngredientes[index].idIngrediente, 0);
-                      listaIngredientes[index].disgustaIngrediente = 0;
-                      return !disgustaSeleccionado;
-                    }
-                  },
-                ),
-                LikeButton(
-                  isLiked: listaIngredientes[index].favoritoIngrediente == 1
-                      ? true
-                      : false,
-                  size: 28,
-                  circleColor: CircleColor(
-                      start: Color(0xFFFBB45C), end: Color(0xFFFBB45C)),
-                  bubblesColor: BubblesColor(
-                    dotPrimaryColor: Color(0xFFFBB45C),
-                    dotSecondaryColor: Color(0xFFF9637C),
-                  ),
-                  likeBuilder: (bool isLiked) {
-                    return isLiked
-                        ? Icon(
-                            MdiIcons.heart,
-                            color: Colors.red,
-                            size: 21,
-                          )
-                        : Icon(
-                            MdiIcons.heartOutline,
-                            color: Colors.white,
-                            size: 21,
-                          );
-                  },
-                  onTap: (favoritoSeleccionado) async {
-                    if (listaIngredientes[index].favoritoIngrediente == 0) {
-                      await DatabaseProvider.db.setIngredienteFavorito(
-                          listaIngredientes[index].idIngrediente, 1);
-                      await DatabaseProvider.db.setDisgustaIngrediente(
-                          listaIngredientes[index].idIngrediente, 0);
+                      comidaCreada.quitarIngrediente(listaIngredientes[index]);
 
-                      listaIngredientes[index].favoritoIngrediente = 1;
-                      listaIngredientes[index].disgustaIngrediente = 0;
-
-                      setState(() {});
-                      return !favoritoSeleccionado;
-                    } else {
-                      await DatabaseProvider.db.setIngredienteFavorito(
-                          listaIngredientes[index].idIngrediente, 0);
-                      listaIngredientes[index].favoritoIngrediente = 0;
-                      return !favoritoSeleccionado;
+                      return !agregadoSeleccionado;
                     }
                   },
                 ),

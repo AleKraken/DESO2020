@@ -32,8 +32,9 @@ class DatabaseProvider {
   static const String COLUMN_NOMBREINGREDIENTE = "nombreIngrediente";
   static const String COLUMN_RUTAIMAGENINGREDIENTE = "rutaImagenIngrediente";
   static const String COLUMN_FAVORITOINGREDIENTE = "favoritoIngrediente";
+  static const String COLUMN_DISGUSTAINGREDIENTE = "disgustaIngrediente";
 
-  //CONSTANTES PARA LA TABLA  COMIDA-INGREDIENTE Y FAVORITOS
+  //CONSTANTES PARA LA TABLA  COMIDA-INGREDIENTE
   static const String TABLE_COMIDA_HAS_INGREDIENTE = "ComidaHasIngrediente";
   static const String COLUMN_FOREIGN_COMIDA = "comida_idComida";
   static const String COLUMN_FOREIGN_INGREDIENTE = "ingrediente_idIngrediente";
@@ -101,6 +102,7 @@ class DatabaseProvider {
           "$COLUMN_NOMBREINGREDIENTE TEXT NOT NULL,"
           "$COLUMN_RUTAIMAGENINGREDIENTE TEXT,"
           "$COLUMN_FAVORITOINGREDIENTE INTEGER NOT NULL,"
+          "$COLUMN_DISGUSTAINGREDIENTE INTEGER NOT NULL,"
           "PRIMARY KEY ($COLUMN_IDINGREDIENTE AUTOINCREMENT)"
           ");",
         );
@@ -193,8 +195,8 @@ class DatabaseProvider {
 
           print("GUARDANDO INGREDIENTE $i EN BASE");
           await database.execute("INSERT INTO $TABLE_INGREDIENTE "
-              "($COLUMN_NOMBREINGREDIENTE, $COLUMN_RUTAIMAGENINGREDIENTE, $COLUMN_FAVORITOINGREDIENTE)"
-              " values ($nombreIngrediente, $rutaImagenIngrediente, 0);");
+              "($COLUMN_NOMBREINGREDIENTE, $COLUMN_RUTAIMAGENINGREDIENTE, $COLUMN_FAVORITOINGREDIENTE, $COLUMN_DISGUSTAINGREDIENTE)"
+              " values ($nombreIngrediente, $rutaImagenIngrediente, 0, 0);");
         }
 
         int getIdIngrediente(int indexComida, int indexIngrediente) {
@@ -358,6 +360,11 @@ class DatabaseProvider {
     );
   }
 
+  Future inicializarBase() async {
+    final db = await database;
+    return db;
+  }
+
   Future setComidaFavorita(int idComida, int ponerFavorita) async {
     final db = await database;
     return await db.rawUpdate(
@@ -368,6 +375,12 @@ class DatabaseProvider {
     final db = await database;
     return await db.rawUpdate(
         "UPDATE $TABLE_INGREDIENTE SET $COLUMN_FAVORITOINGREDIENTE = $ponerFavorito WHERE $COLUMN_IDINGREDIENTE =$idIngrediente");
+  }
+
+  Future setDisgustaIngrediente(int idIngrediente, int ponerDisgusta) async {
+    final db = await database;
+    return await db.rawUpdate(
+        "UPDATE $TABLE_INGREDIENTE SET $COLUMN_DISGUSTAINGREDIENTE = $ponerDisgusta WHERE $COLUMN_IDINGREDIENTE =$idIngrediente");
   }
 
   Future insertComidaDeHorario(
@@ -384,6 +397,213 @@ class DatabaseProvider {
 
     await db.rawDelete(
         "DELETE FROM $TABLE_HORARIO_COMIDAS WHERE $COLUMN_IDCOMIDAHORARIO = $index");
+  }
+
+  Future<List<Comida>> getComidasSugeridasFavoritos() async {
+    final db = await database;
+
+    var comidas = await db.rawQuery("SELECT DISTINCT "
+        "a.$COLUMN_IDCOMIDA,"
+        "a.$COLUMN_NOMBRECOMIDA,"
+        "a.$COLUMN_CATEGORIACOMIDA,"
+        "a.$COLUMN_AREA,"
+        "a.$COLUMN_MINUTOSPREPARACION,"
+        "a.$COLUMN_PASOSPREPARACION,"
+        "a.$COLUMN_CALORIAS,"
+        "a.$COLUMN_RUTAIMAGEN,"
+        "a.$COLUMN_FAVORITOCOMIDA "
+        "FROM $TABLE_COMIDA a, $TABLE_INGREDIENTE b, $TABLE_COMIDA_HAS_INGREDIENTE c "
+        "WHERE b.$COLUMN_FAVORITOINGREDIENTE = 1 "
+        "AND b.$COLUMN_IDINGREDIENTE = c.$COLUMN_FOREIGN_INGREDIENTE "
+        "AND a.$COLUMN_IDCOMIDA = c.$COLUMN_FOREIGN_COMIDA "
+        "ORDER BY RANDOM() "
+        "LIMIT 15");
+
+    if (comidas.length < 1) {
+      comidas = await db.rawQuery("SELECT "
+          "$COLUMN_IDCOMIDA,"
+          "$COLUMN_NOMBRECOMIDA,"
+          "$COLUMN_CATEGORIACOMIDA,"
+          "$COLUMN_AREA,"
+          "$COLUMN_MINUTOSPREPARACION,"
+          "$COLUMN_PASOSPREPARACION,"
+          "$COLUMN_CALORIAS,"
+          "$COLUMN_RUTAIMAGEN,"
+          "$COLUMN_FAVORITOCOMIDA "
+          "FROM $TABLE_COMIDA "
+          "ORDER BY RANDOM() "
+          "LIMIT 16");
+    }
+
+    List<Comida> listaComidas = List<Comida>();
+    comidas.forEach((comidaActual) async {
+      Comida comida = Comida.fromMap(comidaActual);
+
+      listaComidas.add(comida);
+      await Future.delayed(Duration.zero);
+    });
+
+    return listaComidas;
+  }
+
+  Future<Comida> getComidaConIngredientes(Comida comida) async {
+    final db = await database;
+
+    comida.listaIngredientesEnComida = new List<int>();
+    comida.listaMedidasIngredientes = new List<String>();
+
+    List<Map<String, dynamic>> ingredientesEnComida = await db.rawQuery(
+        "SELECT $COLUMN_FOREIGN_INGREDIENTE, $COLUMN_MEDIDAINGREDIENTE "
+        "FROM $TABLE_COMIDA_HAS_INGREDIENTE "
+        "WHERE $COLUMN_FOREIGN_COMIDA = ${comida.idComida}");
+
+    ingredientesEnComida.forEach(
+      (ingredienteActual) async {
+        ComidaHasIngrediente ingrediente =
+            ComidaHasIngrediente.fromMap(ingredienteActual);
+
+        if (ingrediente.foreignIdIngrediente != null) {
+          comida.listaIngredientesEnComida
+              .add(ingrediente.foreignIdIngrediente);
+
+          comida.listaMedidasIngredientes.add(ingrediente.medidaIngrediente);
+        }
+
+        await Future.delayed(Duration.zero);
+      },
+    );
+    return comida;
+  }
+
+  Future<List<Comida>> getComidasSugeridasDisgustos() async {
+    final db = await database;
+
+    var comidasDisgusto = await db.rawQuery("SELECT DISTINCT "
+        "a.$COLUMN_IDCOMIDA,"
+        "a.$COLUMN_NOMBRECOMIDA,"
+        "a.$COLUMN_CATEGORIACOMIDA,"
+        "a.$COLUMN_AREA,"
+        "a.$COLUMN_MINUTOSPREPARACION,"
+        "a.$COLUMN_PASOSPREPARACION,"
+        "a.$COLUMN_CALORIAS,"
+        "a.$COLUMN_RUTAIMAGEN,"
+        "a.$COLUMN_FAVORITOCOMIDA "
+        "FROM $TABLE_COMIDA a, $TABLE_INGREDIENTE b, $TABLE_COMIDA_HAS_INGREDIENTE c "
+        "WHERE b.$COLUMN_DISGUSTAINGREDIENTE = 1 "
+        "AND b.$COLUMN_IDINGREDIENTE = c.$COLUMN_FOREIGN_INGREDIENTE "
+        "AND a.$COLUMN_IDCOMIDA = c.$COLUMN_FOREIGN_COMIDA "
+        "ORDER BY RANDOM() ");
+
+    if (comidasDisgusto.length < 1) {
+      comidasDisgusto = await db.rawQuery("SELECT "
+          "$COLUMN_IDCOMIDA,"
+          "$COLUMN_NOMBRECOMIDA,"
+          "$COLUMN_CATEGORIACOMIDA,"
+          "$COLUMN_AREA,"
+          "$COLUMN_MINUTOSPREPARACION,"
+          "$COLUMN_PASOSPREPARACION,"
+          "$COLUMN_CALORIAS,"
+          "$COLUMN_RUTAIMAGEN,"
+          "$COLUMN_FAVORITOCOMIDA "
+          "FROM $TABLE_COMIDA "
+          "ORDER BY RANDOM() "
+          "LIMIT 16");
+    }
+
+    List<Comida> listaComidasDisgusto = List<Comida>();
+    comidasDisgusto.forEach((comidaActual) async {
+      Comida comida = Comida.fromMap(comidaActual);
+
+      listaComidasDisgusto.add(comida);
+      await Future.delayed(Duration.zero);
+    });
+
+    var comidas = await db.rawQuery("SELECT DISTINCT "
+        "$COLUMN_IDCOMIDA,"
+        "$COLUMN_NOMBRECOMIDA,"
+        "$COLUMN_CATEGORIACOMIDA,"
+        "$COLUMN_AREA,"
+        "$COLUMN_MINUTOSPREPARACION,"
+        "$COLUMN_PASOSPREPARACION,"
+        "$COLUMN_CALORIAS,"
+        "$COLUMN_RUTAIMAGEN,"
+        "$COLUMN_FAVORITOCOMIDA "
+        "FROM $TABLE_COMIDA "
+        "ORDER BY RANDOM() ");
+
+    List<Comida> listaComidas = List<Comida>();
+    comidas.forEach((comidaActual) async {
+      Comida comida = Comida.fromMap(comidaActual);
+
+      listaComidas.add(comida);
+      await Future.delayed(Duration.zero);
+    });
+
+    List<int> listaComidasInt = new List<int>();
+    for (int i = 0; i < listaComidas.length; i++) {
+      listaComidasInt.add(listaComidas[i].idComida);
+    }
+
+    List<int> listaComidasDisgustoInt = new List<int>();
+    for (int i = 0; i < listaComidasDisgusto.length; i++) {
+      listaComidasDisgustoInt.add(listaComidasDisgusto[i].idComida);
+    }
+
+    List<int> listaReducidaInt = new List<int>();
+    listaReducidaInt = listaComidasInt
+        .toSet()
+        .difference(listaComidasDisgustoInt.toSet())
+        .toList();
+
+    List<Comida> listaReducida = new List<Comida>();
+    for (int i = 0; i < listaComidas.length; i++) {
+      for (int y = 0; y < listaReducidaInt.length; y++) {
+        if (listaReducidaInt[y] == listaComidas[i].idComida) {
+          listaReducida.add(listaComidas[i]);
+        }
+        if (listaReducida.length > 14) {
+          return listaReducida;
+        }
+      }
+    }
+    print("OBTENIDOS ${listaReducida.length} ELEMENTOS EN LISTA REDUCIDA");
+    return listaReducida;
+  }
+
+  Future insertarNuevaComida(
+      Comida comida,
+      List<Ingrediente> listaIngredientesAInsertar,
+      List<String> listaCantidades) async {
+    final db = await database;
+
+    await db.insert(TABLE_COMIDA, comida.toMap());
+
+    var ultimo = await db.query(TABLE_COMIDA,
+        columns: [
+          COLUMN_IDCOMIDA,
+        ],
+        limit: 1,
+        orderBy: "$COLUMN_IDCOMIDA desc");
+
+    List<Comida> lastComida = List<Comida>();
+
+    ultimo.forEach((current) {
+      Comida comidaUltimo = Comida.fromMap(current);
+
+      lastComida.add(comidaUltimo);
+    });
+
+    for (int i = 0; i < listaIngredientesAInsertar.length; i++) {
+      ComidaHasIngrediente comidaHasIngrediente = new ComidaHasIngrediente();
+      comidaHasIngrediente.foreignIdComida = lastComida[0].idComida;
+      comidaHasIngrediente.foreignIdIngrediente =
+          listaIngredientesAInsertar[i].idIngrediente;
+      comidaHasIngrediente.medidaIngrediente = listaCantidades[i];
+
+      await db.insert(
+          TABLE_COMIDA_HAS_INGREDIENTE, comidaHasIngrediente.toMap());
+    }
+    return Future.delayed(Duration.zero);
   }
 
   Future<List<Comida>> getComidasDeHorario(int indexDia) async {
@@ -411,33 +631,6 @@ class DatabaseProvider {
       await Future.delayed(Duration.zero);
     });
 
-    for (int i = 0; i < listaComidas.length; i++) {
-      listaComidas[i].listaIngredientesEnComida = new List<int>();
-      listaComidas[i].listaMedidasIngredientes = new List<String>();
-
-      List<Map<String, dynamic>> ingredientesEnComida = await db.rawQuery(
-          "SELECT $COLUMN_FOREIGN_INGREDIENTE, $COLUMN_MEDIDAINGREDIENTE "
-          "FROM $TABLE_COMIDA_HAS_INGREDIENTE "
-          "WHERE $COLUMN_FOREIGN_COMIDA = ${listaComidas[i].idComida}");
-
-      ingredientesEnComida.forEach((ingredienteActual) async {
-        ComidaHasIngrediente ingrediente =
-            ComidaHasIngrediente.fromMap(ingredienteActual);
-
-        if (ingrediente.foreignIdIngrediente != null) {
-          listaComidas[i]
-              .listaIngredientesEnComida
-              .add(ingrediente.foreignIdIngrediente);
-
-          listaComidas[i]
-              .listaMedidasIngredientes
-              .add(ingrediente.medidaIngrediente);
-        }
-
-        await Future.delayed(Duration.zero);
-      });
-    }
-    print(listaComidas.length);
     return listaComidas;
   }
 
@@ -506,33 +699,6 @@ class DatabaseProvider {
       await Future.delayed(Duration.zero);
     });
 
-    for (int i = 0; i < listaComidas.length; i++) {
-      listaComidas[i].listaIngredientesEnComida = new List<int>();
-      listaComidas[i].listaMedidasIngredientes = new List<String>();
-
-      List<Map<String, dynamic>> ingredientesEnComida = await db.rawQuery(
-          "SELECT $COLUMN_FOREIGN_INGREDIENTE, $COLUMN_MEDIDAINGREDIENTE "
-          "FROM $TABLE_COMIDA_HAS_INGREDIENTE "
-          "WHERE $COLUMN_FOREIGN_COMIDA = ${listaComidas[i].idComida}");
-
-      ingredientesEnComida.forEach((ingredienteActual) async {
-        ComidaHasIngrediente ingrediente =
-            ComidaHasIngrediente.fromMap(ingredienteActual);
-
-        if (ingrediente.foreignIdIngrediente != null) {
-          listaComidas[i]
-              .listaIngredientesEnComida
-              .add(ingrediente.foreignIdIngrediente);
-
-          listaComidas[i]
-              .listaMedidasIngredientes
-              .add(ingrediente.medidaIngrediente);
-        }
-
-        await Future.delayed(Duration.zero);
-      });
-    }
-
     return listaComidas;
   }
 
@@ -543,7 +709,8 @@ class DatabaseProvider {
         "$COLUMN_IDINGREDIENTE,"
         "$COLUMN_NOMBREINGREDIENTE,"
         "$COLUMN_RUTAIMAGENINGREDIENTE,"
-        "$COLUMN_FAVORITOINGREDIENTE "
+        "$COLUMN_FAVORITOINGREDIENTE,"
+        "$COLUMN_DISGUSTAINGREDIENTE "
         "FROM $TABLE_INGREDIENTE "
         "WHERE $COLUMN_IDINGREDIENTE = $index");
 
@@ -563,7 +730,8 @@ class DatabaseProvider {
         "$COLUMN_IDINGREDIENTE,"
         "$COLUMN_NOMBREINGREDIENTE,"
         "$COLUMN_RUTAIMAGENINGREDIENTE,"
-        "$COLUMN_FAVORITOINGREDIENTE "
+        "$COLUMN_FAVORITOINGREDIENTE,"
+        "$COLUMN_DISGUSTAINGREDIENTE "
         "FROM $TABLE_INGREDIENTE ");
 
     List<Ingrediente> listaIngredientes = List<Ingrediente>();
@@ -583,7 +751,8 @@ class DatabaseProvider {
         "$COLUMN_IDINGREDIENTE,"
         "$COLUMN_NOMBREINGREDIENTE,"
         "$COLUMN_RUTAIMAGENINGREDIENTE,"
-        "$COLUMN_FAVORITOINGREDIENTE "
+        "$COLUMN_FAVORITOINGREDIENTE,"
+        "$COLUMN_DISGUSTAINGREDIENTE "
         "FROM $TABLE_INGREDIENTE "
         "WHERE $COLUMN_FAVORITOINGREDIENTE = 1");
 
@@ -620,33 +789,6 @@ class DatabaseProvider {
       listaComidas.add(comida);
       await Future.delayed(Duration.zero);
     });
-
-    for (int i = 0; i < listaComidas.length; i++) {
-      listaComidas[i].listaIngredientesEnComida = new List<int>();
-      listaComidas[i].listaMedidasIngredientes = new List<String>();
-
-      List<Map<String, dynamic>> ingredientesEnComida = await db.rawQuery(
-          "SELECT $COLUMN_FOREIGN_INGREDIENTE, $COLUMN_MEDIDAINGREDIENTE "
-          "FROM $TABLE_COMIDA_HAS_INGREDIENTE "
-          "WHERE $COLUMN_FOREIGN_COMIDA = ${listaComidas[i].idComida}");
-
-      ingredientesEnComida.forEach((ingredienteActual) async {
-        ComidaHasIngrediente ingrediente =
-            ComidaHasIngrediente.fromMap(ingredienteActual);
-
-        if (ingrediente.foreignIdIngrediente != null) {
-          listaComidas[i]
-              .listaIngredientesEnComida
-              .add(ingrediente.foreignIdIngrediente);
-
-          listaComidas[i]
-              .listaMedidasIngredientes
-              .add(ingrediente.medidaIngrediente);
-        }
-
-        await Future.delayed(Duration.zero);
-      });
-    }
 
     return listaComidas;
   }

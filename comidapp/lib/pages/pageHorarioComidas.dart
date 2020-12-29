@@ -76,7 +76,9 @@ class _HorarioComidasState extends State<HorarioComidas> {
             onPageChanged: (index) {
               _indicePagina = index;
 
-              setState(() {});
+              if (this.mounted) {
+                setState(() {});
+              }
             },
             itemCount: 7,
             itemBuilder: (_, index) {
@@ -169,31 +171,18 @@ class _PaginaHorarioState extends State<PaginaHorario> {
                                     child: Container(
                                       decoration: BoxDecoration(
                                         borderRadius: BorderRadius.only(
-                                          bottomLeft: Radius.circular(10),
-                                          bottomRight: Radius.circular(10),
-                                        ),
-                                        gradient: LinearGradient(
-                                          begin: Alignment.centerLeft,
-                                          end: Alignment.centerRight,
-                                          colors: [
-                                            Color(0xFFFBB45C),
-                                            Color(0xFFFE7A66),
-                                          ],
+                                          bottomLeft: Radius.circular(20),
+                                          bottomRight: Radius.circular(20),
                                         ),
                                       ),
                                       padding: EdgeInsets.symmetric(
-                                          horizontal: 20, vertical: 10),
+                                          horizontal: 20, vertical: 20),
                                       child: Text(
-                                        "Bienvenido. Estas son las comidas que tienes para el día de hoy.",
-                                        textScaleFactor: 1.12,
-                                        textAlign: TextAlign.center,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .headline2
-                                            .copyWith(
-                                              color: Colors.white,
-                                            ),
-                                      ),
+                                          "Estas son las comidas que tienes para hoy",
+                                          textScaleFactor: .9,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .headline3),
                                     ),
                                   )
                                 : Container(),
@@ -203,10 +192,16 @@ class _PaginaHorarioState extends State<PaginaHorario> {
                         )
                       : Container(
                           padding: EdgeInsets.only(
-                              top: MediaQuery.of(context).size.height / 3),
+                            top: MediaQuery.of(context).size.height / 3,
+                            right: 15,
+                            left: 15,
+                          ),
                           child: Center(
-                            child: Text("No tienes comidas en este día",
-                                style: Theme.of(context).textTheme.headline2),
+                            child: Text(
+                              "Aún no has agregado comidas a este día",
+                              textAlign: TextAlign.center,
+                              style: Theme.of(context).textTheme.headline3,
+                            ),
                           ),
                         ),
                 ),
@@ -336,7 +331,8 @@ class _ContenedorComidaState extends State<ContenedorComida> {
   Widget build(BuildContext context) {
     return AnimatedContainer(
         duration: Duration(milliseconds: 250),
-        height: eliminado ? 0 : 85,
+        height: eliminado ? 0 : 88,
+        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
         margin: eliminado
             ? const EdgeInsets.symmetric(horizontal: 15)
             : const EdgeInsets.symmetric(horizontal: 15, vertical: 25),
@@ -346,10 +342,10 @@ class _ContenedorComidaState extends State<ContenedorComida> {
                 color: Theme.of(context).cardColor,
                 boxShadow: [
                   BoxShadow(
-                    blurRadius: 13,
+                    blurRadius: 11,
                     color: Theme.of(context).shadowColor,
-                    offset: const Offset(-3, 0),
-                    spreadRadius: -5,
+                    offset: const Offset(0, 5),
+                    spreadRadius: -2,
                   ),
                 ],
                 borderRadius: BorderRadius.circular(15),
@@ -364,36 +360,29 @@ class _ContenedorComidaState extends State<ContenedorComida> {
                   child: FlatButton(
                     padding: EdgeInsets.all(0),
                     onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              DetallesComida(listaComidas[index], index),
-                        ),
-                      );
+                      if (!eliminado) {
+                        Navigator.of(context)
+                            .push(
+                          MaterialPageRoute(
+                            builder: (context) => DetallesComida(
+                                listaComidas[index], index, 'heroImagen$index'),
+                          ),
+                        )
+                            .then((value) {
+                          if (this.mounted) {
+                            setState(() {});
+                          }
+                        });
+                      }
                     },
                     child: Row(
                       children: [
                         Container(
-                          height: 85,
-                          width: 100,
+                          height: 75,
+                          width: 90,
                           child: Container(
                             height: 60,
                             width: 60,
-                            decoration: eliminado
-                                ? BoxDecoration(
-                                    color: Theme.of(context).backgroundColor)
-                                : BoxDecoration(
-                                    color: Theme.of(context).backgroundColor,
-                                    borderRadius: BorderRadius.circular(10),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        blurRadius: 13,
-                                        color: Theme.of(context).shadowColor,
-                                        offset: const Offset(-1, 0),
-                                        spreadRadius: -1,
-                                      ),
-                                    ],
-                                  ),
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(10),
                               child: Hero(
@@ -423,13 +412,6 @@ class _ContenedorComidaState extends State<ContenedorComida> {
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis),
                                 Divider(height: 3),
-                                Text(
-                                    "${listaComidas[index].listaIngredientesEnComida.length} ingredientes",
-                                    style:
-                                        Theme.of(context).textTheme.subtitle2,
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis),
-                                Divider(height: 3, color: Colors.transparent),
                                 Text("${listaComidas[index].calorias} calorías",
                                     style:
                                         Theme.of(context).textTheme.subtitle2,
@@ -470,7 +452,9 @@ class _ContenedorComidaState extends State<ContenedorComida> {
                               listaHorario[index].idComidaHorario);
 
                           eliminado = true;
-                          setState(() {});
+                          if (this.mounted) {
+                            setState(() {});
+                          }
                           return !modificarSeleccionado;
                         },
                       ),

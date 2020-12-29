@@ -7,12 +7,14 @@ class Ingrediente {
   String nombreIngrediente;
   String rutaImagenIngrediente;
   int favoritoIngrediente;
+  int disgustaIngrediente;
 
   Ingrediente({
     this.idIngrediente,
     this.nombreIngrediente,
     this.rutaImagenIngrediente,
     this.favoritoIngrediente,
+    this.disgustaIngrediente,
   });
 
   Map<String, dynamic> toMap() {
@@ -21,6 +23,7 @@ class Ingrediente {
       DatabaseProvider.COLUMN_NOMBREINGREDIENTE: nombreIngrediente,
       DatabaseProvider.COLUMN_RUTAIMAGENINGREDIENTE: rutaImagenIngrediente,
       DatabaseProvider.COLUMN_FAVORITOINGREDIENTE: favoritoIngrediente,
+      DatabaseProvider.COLUMN_DISGUSTAINGREDIENTE: disgustaIngrediente,
     };
 
     if (idIngrediente != null) {
@@ -35,5 +38,6 @@ class Ingrediente {
     nombreIngrediente = map[DatabaseProvider.COLUMN_NOMBREINGREDIENTE];
     rutaImagenIngrediente = map[DatabaseProvider.COLUMN_RUTAIMAGENINGREDIENTE];
     favoritoIngrediente = map[DatabaseProvider.COLUMN_FAVORITOINGREDIENTE];
+    disgustaIngrediente = map[DatabaseProvider.COLUMN_DISGUSTAINGREDIENTE];
   }
 }

@@ -57,7 +57,14 @@ class _IngredientesFavoritosState extends State<IngredientesFavoritos> {
                 } else {
                   return listaIngredientes.length > 0
                       ? ListaContenedoresIngredientes(listaIngredientes)
-                      : Container();
+                      : Container(
+                          padding: EdgeInsets.symmetric(horizontal: 30),
+                          child: Text(
+                            "Aún no tienes ingredientes en favoritos",
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context).textTheme.headline3,
+                          ),
+                        );
                 }
               }),
         ),
@@ -123,11 +130,22 @@ Color getColor(int index) {
   return color;
 }
 
-class ContenedorIngrediente extends StatelessWidget {
+class ContenedorIngrediente extends StatefulWidget {
   final int index;
   final List<Ingrediente> listaIngredientes;
 
   ContenedorIngrediente(this.index, this.listaIngredientes);
+
+  @override
+  _ContenedorIngredienteState createState() =>
+      _ContenedorIngredienteState(index, listaIngredientes);
+}
+
+class _ContenedorIngredienteState extends State<ContenedorIngrediente> {
+  int index;
+  List<Ingrediente> listaIngredientes;
+
+  _ContenedorIngredienteState(this.index, this.listaIngredientes);
 
   @override
   Widget build(BuildContext context) {
@@ -187,10 +205,8 @@ class ContenedorIngrediente extends StatelessWidget {
                 },
                 placeholder:
                     AssetImage('assets/images/ingredienteCargando.png'),
-                image: index > 534
-                    ? AssetImage('assets/images/ingredienteCargando.png')
-                    : NetworkImage(
-                        '${listaIngredientes[index].rutaImagenIngrediente}'),
+                image: NetworkImage(
+                    '${listaIngredientes[index].rutaImagenIngrediente}'),
                 fit: BoxFit.cover,
                 height: 100.0,
                 width: 100.0,
@@ -209,6 +225,9 @@ class ContenedorIngrediente extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 LikeButton(
+                  isLiked: listaIngredientes[index].disgustaIngrediente == 1
+                      ? true
+                      : false,
                   size: 28,
                   circleColor: CircleColor(
                       start: Color(0xFFFBB45C), end: Color(0xFFFBB45C)),
@@ -228,6 +247,26 @@ class ContenedorIngrediente extends StatelessWidget {
                             color: Colors.white,
                             size: 21,
                           );
+                  },
+                  onTap: (disgustaSeleccionado) async {
+                    if (listaIngredientes[index].disgustaIngrediente == 0) {
+                      await DatabaseProvider.db.setDisgustaIngrediente(
+                          listaIngredientes[index].idIngrediente, 1);
+                      await DatabaseProvider.db.setIngredienteFavorito(
+                          listaIngredientes[index].idIngrediente, 0);
+
+                      listaIngredientes[index].favoritoIngrediente = 0;
+                      listaIngredientes[index].disgustaIngrediente = 1;
+
+                      setState(() {});
+
+                      return !disgustaSeleccionado;
+                    } else {
+                      await DatabaseProvider.db.setDisgustaIngrediente(
+                          listaIngredientes[index].idIngrediente, 0);
+                      listaIngredientes[index].disgustaIngrediente = 0;
+                      return !disgustaSeleccionado;
+                    }
                   },
                 ),
                 LikeButton(
@@ -258,15 +297,18 @@ class ContenedorIngrediente extends StatelessWidget {
                     if (listaIngredientes[index].favoritoIngrediente == 0) {
                       await DatabaseProvider.db.setIngredienteFavorito(
                           listaIngredientes[index].idIngrediente, 1);
+                      await DatabaseProvider.db.setDisgustaIngrediente(
+                          listaIngredientes[index].idIngrediente, 0);
 
                       listaIngredientes[index].favoritoIngrediente = 1;
-                      print("ISERTANDO ELEMENTO");
+                      listaIngredientes[index].disgustaIngrediente = 0;
+
+                      setState(() {});
                       return !favoritoSeleccionado;
                     } else {
                       await DatabaseProvider.db.setIngredienteFavorito(
                           listaIngredientes[index].idIngrediente, 0);
                       listaIngredientes[index].favoritoIngrediente = 0;
-                      print("ELIMINANDO ELEMENTO");
                       return !favoritoSeleccionado;
                     }
                   },

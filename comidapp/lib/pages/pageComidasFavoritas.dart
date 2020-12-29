@@ -61,7 +61,14 @@ class _ComidasFavoritasState extends State<ComidasFavoritas> {
                 } else {
                   return listaComidas.length > 0
                       ? ListaContenedoresComidas(listaComidas)
-                      : Container();
+                      : Container(
+                          padding: EdgeInsets.symmetric(horizontal: 30),
+                          child: Text(
+                            "Aún no tienes comidas en favoritos",
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context).textTheme.headline3,
+                          ),
+                        );
                 }
               }),
         ),
@@ -127,10 +134,10 @@ class _ContenedorComidaState extends State<ContenedorComida> {
         color: Theme.of(context).cardColor,
         boxShadow: [
           BoxShadow(
-            blurRadius: 13,
+            blurRadius: 11,
             color: Theme.of(context).shadowColor,
-            offset: const Offset(-3, 0),
-            spreadRadius: -5,
+            offset: const Offset(0, 5),
+            spreadRadius: -2,
           ),
         ],
         borderRadius: BorderRadius.circular(15),
@@ -144,12 +151,14 @@ class _ContenedorComidaState extends State<ContenedorComida> {
                 Navigator.of(context)
                     .push(
                   MaterialPageRoute(
-                    builder: (context) =>
-                        DetallesComida(listaComidas[index], index),
+                    builder: (context) => DetallesComida(
+                        listaComidas[index], index, 'heroImagen$index'),
                   ),
                 )
                     .then((value) {
-                  setState(() {});
+                  if (this.mounted) {
+                    setState(() {});
+                  }
                 });
               },
               child: Row(
@@ -200,12 +209,6 @@ class _ContenedorComidaState extends State<ContenedorComida> {
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis),
                           Divider(height: 3),
-                          Text(
-                              "${listaComidas[index].listaIngredientesEnComida.length} ingredientes",
-                              style: Theme.of(context).textTheme.subtitle2,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis),
-                          Divider(height: 3, color: Colors.transparent),
                           Text("${listaComidas[index].calorias} calorías",
                               style: Theme.of(context).textTheme.subtitle2,
                               maxLines: 1,
@@ -314,6 +317,8 @@ class _ContenedorComidaState extends State<ContenedorComida> {
       if (comidaNotifier.comidaGuardada) {
         Scaffold.of(context).showSnackBar(
           SnackBar(
+            elevation: 6.0,
+            behavior: SnackBarBehavior.floating,
             content: Text('Comida agregada a horario'),
             duration: Duration(seconds: 3),
           ),

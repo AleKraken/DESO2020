@@ -348,9 +348,9 @@ class OpcionesComida extends StatelessWidget {
                     height: 30,
                   ),
                   Text("Esta comida ya está en el $diaStr actualmente.",
-                      textScaleFactor: .4,
+                      textScaleFactor: .65,
                       textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.headline4),
+                      style: Theme.of(context).textTheme.headline3),
                   Container(
                     height: 30,
                   ),

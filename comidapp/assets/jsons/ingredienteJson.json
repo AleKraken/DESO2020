@@ -3209,29 +3209,11 @@
 			"strIngredient": "Mincemeat",
 			"strDescription": "Mincemeat is a mixture of chopped dried fruit, distilled spirits and spices, and sometimes beef suet, beef, or venison. Originally, mincemeat always contained meat. Many modern recipes contain beef suet, though vegetable shortening is sometimes used in its place.",
 			"strType": "Spice"
-		},
-		{
-			"idIngredient": "565",
-			"strIngredient": "Sweet Potatoes",
-			"strDescription": "The sweet potato or sweetpotato is a dicotyledonous plant that belongs to the bindweed or morning glory family, Convolvulaceae. Its large, starchy, sweet-tasting, tuberous roots are a root vegetable. The young leaves and shoots are sometimes eaten as greens.",
-			"strType": "Root Vegetable"
-		},
-		{
-			"idIngredient": "566",
-			"strIngredient": "Bread Rolls",
-			"strDescription": "A roll is a small, usually round or oblong individual loaf of bread served as a meal accompaniment (eaten plain or with butter) A roll can be served and eaten whole or cut transversely and dressed with filling between the two halves. Rolls are also commonly used to make sandwiches similar to those produced using slices of bread. They are found in most cuisines all over the world. In the Deipnosophistae, the author Athenaeus (c. 170 – c. 230) describes some of the bread, cakes, and pastries available in the Classical world. Among the breads mentioned are griddle cakes, honey-and-oil bread, mushroom-shaped loaves covered in poppy seeds, and the military specialty of rolls baked on a spit.",
-			"strType": "Bread"
-		},
+		},		
 		{
 			"idIngredient": "567",
 			"strIngredient": "Bun",
 			"strDescription": "A bun is a small, sometimes sweet, bread-based item[1] or roll. Though they come in many shapes and sizes, they are most commonly hand-sized or smaller, with a round top and flat bottom.",
-			"strType": "Bread"
-		},
-		{
-			"idIngredient": "568",
-			"strIngredient": "Potatoe Buns",
-			"strDescription": "Potato bread is a form of bread in which potato flour or potato replaces a portion of the regular wheat flour. It is cooked in a variety of ways, including baking it on a hot griddle or pan, or in an oven. It may be leavened or unleavened, and may have a variety of other ingredients baked into it. The ratio of potato to wheat flour varies significantly from recipe to recipe, with some recipes having a majority of potato, and others having a majority of wheat flour. Some recipes call for mashed potatoes, with others calling for dehydrated potato flakes. It is available as a commercial product in many countries, with similar variations in ingredients, cooking method, and other variables.",
 			"strType": "Bread"
 		},
 		{
@@ -3247,45 +3229,9 @@
 			"strType": "Meat"
 		},
 		{
-			"idIngredient": "571",
-			"strIngredient": "Yukon Gold Potatoes",
-			"strDescription": "Yukon Gold is a large cultivar of potato most distinctly characterized by its thin, smooth, eye-free skin and yellow-tinged flesh. This potato was developed in the 1960s by Garnet Johnston in Guelph, Ontario, Canada, with the help of Geoff Rowberry at the University of Guelph. The official cross was made in 1966 and Yukon Gold was finally released into the market in 1980.",
-			"strType": "Root Vegetable"
-		},
-		{
-			"idIngredient": "572",
-			"strIngredient": "Yellow Onion",
-			"strDescription": "The brown onion or yellow onion is a variety of dry onion with a strong flavour. They have a greenish-white, light yellow, or white inside; its layers of papery skin have a yellow-brown or pale golden colour",
-			"strType": "Vegetable"
-		},
-		{
-			"idIngredient": "573",
-			"strIngredient": "Beef Stock Concentrate",
-			"strDescription": "Stock, sometimes called bone broth, is a savory cooking liquid that forms the basis of many dishes, particularly soups, stews and sauces. Making stock involves simmering animal bones or meat, seafood, or vegetables in water or wine, often for an extended period of time. Mirepoix or other aromatics may be added for more flavor.",
-			"strType": "Stock"
-		},
-		{
-			"idIngredient": "574",
-			"strIngredient": "Chicken Stock Concentrate",
-			"strDescription": "Stock, sometimes called bone broth, is a savory cooking liquid that forms the basis of many dishes, particularly soups, stews and sauces. Making stock involves simmering animal bones or meat, seafood, or vegetables in water or wine, often for an extended period of time. Mirepoix or other aromatics may be added for more flavor.",
-			"strType": "Stock"
-		},
-		{
-			"idIngredient": "575",
-			"strIngredient": "Persian Cucumber",
-			"strDescription": "Cucumber (Cucumis sativus) is a widely cultivated plant in the gourd family, Cucurbitaceae. It is a creeping vine that bears cucumiform fruits that are used as vegetables. There are three main varieties of cucumber: slicing, pickling, and seedless. Within these varieties, several cultivars have been created. In North America, the term \"wild cucumber\" refers to plants in the genera Echinocystis and Marah, but these are not closely related. The cucumber is originally from South Asia, but now grows on most continents. Many different types of cucumber are traded on the global market.",
-			"strType": "Vegetable"
-		},
-		{
 			"idIngredient": "576",
 			"strIngredient": "Mayonnaise",
 			"strDescription": "Mayonnaise, informally mayo is a thick cold condiment or dressing commonly used in sandwiches and composed salads or on French fries. It is also a base in sauces such as Tartar sauce.",
-			"strType": "Sauce"
-		},
-		{
-			"idIngredient": "577",
-			"strIngredient": "Sriracha",
-			"strDescription": "Sriracha is a type of hot sauce or chili sauce made from a paste of chili peppers, distilled vinegar, garlic, sugar, and salt.",
 			"strType": "Sauce"
 		},
 		{
@@ -3335,12 +3281,6 @@
 			"strIngredient": "Iceberg Lettuce",
 			"strDescription": "Iceberg is a variety of lettuce with crisp leaves that grow in a spherical head resembling cabbage. It is considered one of the sweeter lettuce varieties like romaine and butterhead. Mature iceberg lettuce grows to about one foot in diameter.",
 			"strType": "Vegetable"
-		},
-		{
-			"idIngredient": "587",
-			"strIngredient": "Gherkin Relish",
-			"strDescription": "A relish is a cooked and pickled product made of chopped vegetables, fruits or herbs and is a food item typically used as a condiment to enhance a staple. Examples are chutneys and the North American relish, a pickled cucumber jam eaten with hot dogs or hamburgers.",
-			"strType": "Sauce"
 		},
 		{
 			"idIngredient": "588",
