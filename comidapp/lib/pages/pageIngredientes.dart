@@ -258,22 +258,11 @@ Color getColor(int index) {
   return color;
 }
 
-class ContenedorIngrediente extends StatefulWidget {
-  final int index;
-  final List<Ingrediente> listaIngredientes;
-
-  ContenedorIngrediente(this.index, this.listaIngredientes);
-
-  @override
-  _ContenedorIngredienteState createState() =>
-      _ContenedorIngredienteState(index, listaIngredientes);
-}
-
-class _ContenedorIngredienteState extends State<ContenedorIngrediente> {
+class ContenedorIngrediente extends StatelessWidget {
   int index;
   List<Ingrediente> listaIngredientes;
 
-  _ContenedorIngredienteState(this.index, this.listaIngredientes);
+  ContenedorIngrediente(this.index, this.listaIngredientes);
 
   @override
   Widget build(BuildContext context) {
@@ -377,23 +366,25 @@ class _ContenedorIngredienteState extends State<ContenedorIngrediente> {
                           );
                   },
                   onTap: (disgustaSeleccionado) async {
-                    if (listaIngredientes[index].disgustaIngrediente == 0) {
-                      await DatabaseProvider.db.setDisgustaIngrediente(
-                          listaIngredientes[index].idIngrediente, 1);
-                      await DatabaseProvider.db.setIngredienteFavorito(
-                          listaIngredientes[index].idIngrediente, 0);
+                    if (listaIngredientes[index].favoritoIngrediente == 0) {
+                      if (listaIngredientes[index].disgustaIngrediente == 0) {
+                        await DatabaseProvider.db.setDisgustaIngrediente(
+                            listaIngredientes[index].idIngrediente, 1);
+                        await DatabaseProvider.db.setIngredienteFavorito(
+                            listaIngredientes[index].idIngrediente, 0);
 
-                      listaIngredientes[index].favoritoIngrediente = 0;
-                      listaIngredientes[index].disgustaIngrediente = 1;
+                        listaIngredientes[index].favoritoIngrediente = 0;
+                        listaIngredientes[index].disgustaIngrediente = 1;
 
-                      setState(() {});
-
-                      return !disgustaSeleccionado;
+                        return !disgustaSeleccionado;
+                      } else {
+                        await DatabaseProvider.db.setDisgustaIngrediente(
+                            listaIngredientes[index].idIngrediente, 0);
+                        listaIngredientes[index].disgustaIngrediente = 0;
+                        return !disgustaSeleccionado;
+                      }
                     } else {
-                      await DatabaseProvider.db.setDisgustaIngrediente(
-                          listaIngredientes[index].idIngrediente, 0);
-                      listaIngredientes[index].disgustaIngrediente = 0;
-                      return !disgustaSeleccionado;
+                      return disgustaSeleccionado;
                     }
                   },
                 ),
@@ -422,22 +413,25 @@ class _ContenedorIngredienteState extends State<ContenedorIngrediente> {
                           );
                   },
                   onTap: (favoritoSeleccionado) async {
-                    if (listaIngredientes[index].favoritoIngrediente == 0) {
-                      await DatabaseProvider.db.setIngredienteFavorito(
-                          listaIngredientes[index].idIngrediente, 1);
-                      await DatabaseProvider.db.setDisgustaIngrediente(
-                          listaIngredientes[index].idIngrediente, 0);
+                    if (listaIngredientes[index].disgustaIngrediente == 0) {
+                      if (listaIngredientes[index].favoritoIngrediente == 0) {
+                        await DatabaseProvider.db.setIngredienteFavorito(
+                            listaIngredientes[index].idIngrediente, 1);
+                        await DatabaseProvider.db.setDisgustaIngrediente(
+                            listaIngredientes[index].idIngrediente, 0);
 
-                      listaIngredientes[index].favoritoIngrediente = 1;
-                      listaIngredientes[index].disgustaIngrediente = 0;
+                        listaIngredientes[index].favoritoIngrediente = 1;
+                        listaIngredientes[index].disgustaIngrediente = 0;
 
-                      setState(() {});
-                      return !favoritoSeleccionado;
+                        return !favoritoSeleccionado;
+                      } else {
+                        await DatabaseProvider.db.setIngredienteFavorito(
+                            listaIngredientes[index].idIngrediente, 0);
+                        listaIngredientes[index].favoritoIngrediente = 0;
+                        return !favoritoSeleccionado;
+                      }
                     } else {
-                      await DatabaseProvider.db.setIngredienteFavorito(
-                          listaIngredientes[index].idIngrediente, 0);
-                      listaIngredientes[index].favoritoIngrediente = 0;
-                      return !favoritoSeleccionado;
+                      return favoritoSeleccionado;
                     }
                   },
                 ),
